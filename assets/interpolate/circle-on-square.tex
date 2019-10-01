@@ -1,0 +1,15 @@
+\documentclass[convert={density=300,outext=.png}]{standalone}
+\usepackage{tikz}
+\usepackage{xifthen}
+\usetikzlibrary{calc}
+\usetikzlibrary{patterns}
+\begin{document}
+\begin{tikzpicture}
+    \draw (0, 0) circle (1);
+    \draw (-1, -1) rectangle (1, 1);
+    \draw[dotted] (0, 0) -- (1, 1);
+    \draw[fill=green] (0.707, 0.707) circle (1pt);
+    \draw[fill=blue] (1, 1) circle (1pt);
+    \draw[fill=red] (0.8535, 0.8535) circle (1pt);
+\end{tikzpicture}
+\end{document}
