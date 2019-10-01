@@ -1,6 +1,7 @@
 ---
 layout: post
-title:  "Blackbox - Chapter 1"
+title:  "Blackbox"
+subtitle: "Level 1"
 date:   2012-01-20
 categories: reverse-engineering
 ---
