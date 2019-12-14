@@ -544,7 +544,7 @@ uint8_t hash(uint8_t n)
 }
 ```
 
-We can ask, is it possible this computation gives as the result 107?
+We can ask, is it possible this computation gives as the result 249?
 
 To do that, we can contruct the exact expression for the result of this function.
 
@@ -584,16 +584,16 @@ def hash(n):
 We want this array of bits to have some concrete value:
 
 ```python
->>> for x, y in zip(hash(n), Word.from_uint(107, 8)):
+>>> for x, y in zip(hash(n), Word.from_uint(249, 8)):
     print(f'{y} = {x}')
 1 = ¬d
-1 = d
+0 = d
 0 = ¬b
 1 = ((b ∧ ¬g) ∨ (¬b ∧ g))
-0 = ((¬b ∧ d) ∨ (d ∧ ¬g) ∨ (b ∧ ¬d ∧ g))
+1 = ((¬b ∧ d) ∨ (d ∧ ¬g) ∨ (b ∧ ¬d ∧ g))
 1 = ((¬b ∧ ¬e) ∨ (¬d ∧ ¬e) ∨ (¬e ∧ ¬g) ∨ (b ∧ d ∧ e ∧ g))
 1 = ((¬b ∧ e) ∨ (¬b ∧ ¬d ∧ e) ∨ (b ∧ ¬d ∧ ¬e) ∨ (¬b ∧ e) ∨ (¬b ∧ e ∧ ¬g) ∨ (b ∧ ¬e ∧ ¬g))
-0 = ((¬b ∧ ¬c ∧ g) ∨ (¬b ∧ c ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬d ∧ g) ∨ (¬b ∧ c ∧ ¬d ∧ ¬g) ∨ (¬c ∧ ¬d ∧ ¬e ∧ g) ∨ (c ∧ ¬d ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ e ∧ g) ∨ (¬b ∧ c ∧ e ∧ ¬g) ∨ (¬b ∧ c ∧ ¬g) ∨ (c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (b ∧ ¬c ∧ e ∧ ¬g) ∨ (b ∧ c ∧ e ∧ g) ∨ (b ∧ c ∧ d ∧ ¬e ∧ g))
+1 = ((¬b ∧ ¬c ∧ g) ∨ (¬b ∧ c ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬d ∧ g) ∨ (¬b ∧ c ∧ ¬d ∧ ¬g) ∨ (¬c ∧ ¬d ∧ ¬e ∧ g) ∨ (c ∧ ¬d ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ e ∧ g) ∨ (¬b ∧ c ∧ e ∧ ¬g) ∨ (¬b ∧ c ∧ ¬g) ∨ (c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (b ∧ ¬c ∧ e ∧ ¬g) ∨ (b ∧ c ∧ e ∧ g) ∨ (b ∧ c ∧ d ∧ ¬e ∧ g))
 ```
 
 So we essentially have a system of boolean equations with 8 variables (`a` through `h`) and we want to know if there's a solution...but that's enough for now, next time we'll explore how to solve such a system.
