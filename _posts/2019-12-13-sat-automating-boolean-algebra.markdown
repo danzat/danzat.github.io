@@ -541,7 +541,7 @@ class Word:
                 b = FALSE
             result.append(a ^ b ^ carry)
             carry = (a & b) | (carry & (a ^ b))
-        return Word(map(simplify, result)), simplify(carry)
+        return self.__class__(map(simplify, result)), simplify(carry)
 
 >>> x = Word([a, a, a])
 >>> x
@@ -580,32 +580,41 @@ class Word:
         return Word([simplify(x ^ y) for x, y in zip(self, other)])
     def ror(self, amount):
         return Word(self._bits[amount:] + self._bits[:amount])
+
+class Byte(Word):
+    def __init__(self, bits):
+        if len(bits) < 8:
+            self._bites = bits + (8 - len(bits)) * [FALSE]
+        else:
+            self._bits = bits[:8]
+    def __add__(self, other):
+        result, _ = super().__sum__(other)
+        return result
+    def ror(self, amount):
+        return Word(self._bits[amount:] + self._bits[:amount])
     @staticmethod
-    def from_uint(v, n):
+    def from_uint(v):
         bits = []
-        for i in range(n):
+        for i in range(8):
             bits.append(Literal(v % 2))
             v = v // 2
-        return Word(bits)
+        return Byte(bits)
 ```
 
 Now we can do this:
 
 ```python
 def hash(n):
-    a = n
-    a, _ = a + (n ^ Word.from_uint(37, 8))
-    a, _ = a + (n.ror(3) & Word.from_uint(201, 8))
-    return a
+    return n + (n ^ Byte.from_uint(37)) + (n.ror(3) & Byte.from_uint(201))
 
->>> hash(Word([a, b, c, d, e, f, g, h]))
+>>> hash(Byte([a, b, c, d, e, f, g, h]))
 {¬d, d, ¬b, ((b ∧ ¬g) ∨ (¬b ∧ g)), ((¬b ∧ d) ∨ (d ∧ ¬g) ∨ (b ∧ ¬d ∧ g)), ((¬b ∧ ¬e) ∨ (¬d ∧ ¬e) ∨ (¬e ∧ ¬g) ∨ (b ∧ d ∧ e ∧ g)), ((¬b ∧ e) ∨ (¬b ∧ ¬d ∧ e) ∨ (b ∧ ¬d ∧ ¬e) ∨ (¬b ∧ e) ∨ (¬b ∧ e ∧ ¬g) ∨ (b ∧ ¬e ∧ ¬g)), ((¬b ∧ ¬c ∧ g) ∨ (¬b ∧ c ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬d ∧ g) ∨ (¬b ∧ c ∧ ¬d ∧ ¬g) ∨ (¬c ∧ ¬d ∧ ¬e ∧ g) ∨ (c ∧ ¬d ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ e ∧ g) ∨ (¬b ∧ c ∧ e ∧ ¬g) ∨ (¬b ∧ c ∧ ¬g) ∨ (c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (b ∧ ¬c ∧ e ∧ ¬g) ∨ (b ∧ c ∧ e ∧ g) ∨ (b ∧ c ∧ d ∧ ¬e ∧ g))}
 ```
 
 We want this array of bits to have some concrete value:
 
 ```python
->>> for x, y in zip(hash(n), Word.from_uint(249, 8)):
+>>> for x, y in zip(hash(n), Byte.from_uint(249)):
     print(f'{y} = {x}')
 1 = ¬d
 0 = d
