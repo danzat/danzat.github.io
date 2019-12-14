@@ -56,7 +56,9 @@ The next thing we would want to do is perform operations on these variables. The
 
 Classically, they are binary operators, meaning they operate on two variables, but they can operate on several variables using the [associative property](https://en.wikipedia.org/wiki/Associative_property):
 
-(A ∨ B) ∨ C = A ∨ (B ∨ C) = A ∨ B ∨ C
+{% raw %}
+$$(A \vee B) \vee C = A \vee (B \vee C) = A \vee B \vee C$$
+{% endraw %}
 
 So we have the notion of a clause with an operator type:
 
@@ -120,20 +122,25 @@ Now we can write:
 Ok...what was that mess? Well this is something we could potentially encounter after performing some sort of computation using the variables a, b and c.
 
 It is possible to simplify the expression. If we were to use pen and paper, we would iteratively apply the following properties:
-1. [Associativity](https://en.wikipedia.org/wiki/Associative_property): `(a ∨ b) ∨ c = a ∨ b ∨ c`
-2. [Distributivity](https://en.wikipedia.org/wiki/Distributive_property): `a ∧ (b ∨ c) = (a ∧ b) ∨ (a ∧ c)`
-2. [Commutativity](https://en.wikipedia.org/wiki/Commutative_property): `a ∧ b = b ∧ a`
+1. [Associativity](https://en.wikipedia.org/wiki/Associative_property): {% raw %} $(a \vee b) \vee c = a \vee b \vee c$ {% endraw %}
+2. [Distributivity](https://en.wikipedia.org/wiki/Distributive_property): {% raw %} $a \wedge (b \vee c) = (a \wedge b) \vee (a \wedge c)$ {% endraw %}
+2. [Commutativity](https://en.wikipedia.org/wiki/Commutative_property): {% raw %} $a \wedge b = b \wedge a$ {% endraw %}
 3. [Idempotence](https://en.wikipedia.org/wiki/Idempotence) of the logic operators:
- - `a ∧ a = a`
- - `a ∨ a = a`
+ - {% raw %} $a \wedge a = a$ {% endraw %}
+ - {% raw %} $a \vee a = a$ {% endraw %}
 
-```
-(a ∨ b) ∧ (b ∨ (c ∧ a)) =
-    ((a ∨ b) ∧ b) ∨ ((a ∨ b) ∧ (c ∧ a)) =
-    (a ∧ b) ∨ (b ∧ b) ∨ (a ∧ (c ∧ a)) ∨ (b ∧ (c ∧ a)) =
-    (a ∧ b) ∨ b ∨ (a ∧ a ∧ c) ∨ (a ∧ b ∧ c) =
-    (a ∧ b) ∨ b ∨ (a ∧ c) ∨ (a ∧ b ∧ c)
-```
+For example:
+
+{% raw %}
+$$
+\begin{eqnarray*}
+(a \vee b) \wedge (b \vee (c \wedge a)) & = & ((a \vee b) \wedge b) \vee ((a \vee b) \wedge (c \wedge a)) \\
+& = & (a \wedge b) \vee (b \wedge b) \vee (a \wedge (c \wedge a)) \vee (b \wedge (c \wedge a)) \\
+& = & (a \wedge b) \vee b \vee (a \wedge a \wedge c) \vee (a \wedge b \wedge c) \\
+& = & (a \wedge b) \vee b \vee (a \wedge c) \vee (a \wedge b \wedge c)
+\end{eqnarray*}
+$$
+{% endraw %}
 
 ## Simplification
 
@@ -281,11 +288,11 @@ class Clause(BooleanExpression):
 
 Suppose we are walking over the operands of an And clause and we encounter an Or:
 
-```
-a ∧ b ∧ c ∧ (e ∨ f)
-```
+{% raw %}
+$$a \wedge b \wedge c \wedge (e \vee f)$$
+{% endraw %}
 
-We want to take all the operands we encountered up till then (`a ∧ b ∧ c`) consider them a single clause (`x = a ∧ b ∧ c`) and distribute the expression `x ∧ (e ∨ f)`:
+We want to take all the operands we encountered up till then ({% raw %} $a \wedge b \wedge c$ {% endraw %}) consider them a single clause ({% raw %} $x = a \wedge b \wedge c$ {% endraw %}) and distribute the expression {% raw %} $x \wedge (e \vee f)$ {% endraw %}:
 
 ```python
 class And(Clause):
@@ -316,7 +323,7 @@ Exactly like the manual calculation!
 
 ### Not
 
-So far we have ignored the Not(¬) operation. Let's work it in:
+So far we have ignored the Not({% raw %} $\neg$ {% endraw %}) operation. Let's work it in:
 
 ```python
 class Not(BooleanExpression):
@@ -373,8 +380,14 @@ a
 ### De-Morgan
 
 We have two more simplification rules for Not. Namely, the [De-Morgan laws](https://en.wikipedia.org/wiki/De_Morgan%27s_laws):
-1. ¬(a ∧ b) = ¬a ∨ ¬b
-2. ¬(a ∨ b) = ¬a ∧ ¬b
+{% raw %}
+$$
+\begin{eqnarray*}
+\neg(a \wedge b) & = & \neg a \vee \neg b \newline
+\neg(a \vee b) & = & \neg a \wedge \neg b
+\end{eqnarray*}
+$$
+{% endraw %}
 
 ```python
 class Not(BooleanExpression):
@@ -399,6 +412,10 @@ class Not(BooleanExpression):
 
 ### XOR
 
+XOR (exclusive or) is defined as:
+
+{% raw %} $$ a \oplus b = (a \vee \neg b) \wedge (\neg a \vee b) $$ {% endraw %}
+
 We can also define a convenience method for the XOR operation:
 
 ```python
@@ -411,8 +428,14 @@ class BooleanExpression:
 ### Identity, Null and Cancellation
 
 Now, we want to be able to cancel things out. What does canceling out mean? It depends on the operator:
-- a ∧ ¬a = 0
-- a ∨ ¬a = 1
+{% raw %}
+$$
+\begin{eqnarray*}
+a \wedge \neg a & = & 0 \newline
+a \vee \neg a & = & 1
+\end{eqnarray*}
+$$
+{% endraw %}
 
 First let's add these new literals to our code:
 
@@ -429,12 +452,12 @@ TRUE = Literal(1)
 ```
 
 These new literals have their own unique properties with regard to operators:
-- ¬0 = 1
-- ¬1 = 0
-- a ∧ 0 = 0
-- a ∧ 1 = a
-- a ∨ 0 = a
-- a ∨ 1 = 1
+- {% raw %} $ \neg 0 = 1 $ {% endraw %}
+- {% raw %} $ \neg 1 = 0 $ {% endraw %}
+- {% raw %} $ a \wedge 0 = 0 $ {% endraw %}
+- {% raw %} $ a \wedge 1 = a $ {% endraw %}
+- {% raw %} $ a \vee 0 = a $ {% endraw %}
+- {% raw %} $ a \vee 1 = 1 $ {% endraw %}
 
 ```python
 class Not(BooleanExpression):
