@@ -575,11 +575,11 @@ First, let's buff the capabilities of our `Word`:
 class Word:
     # ...
     def __and__(self, other):
-        return Word([simplify(x & y) for x, y in zip(self, other)])
+        return self.__class__([simplify(x & y) for x, y in zip(self, other)])
     def __xor__(self, other):
-        return Word([simplify(x ^ y) for x, y in zip(self, other)])
+        return self.__class__([simplify(x ^ y) for x, y in zip(self, other)])
     def ror(self, amount):
-        return Word(self._bits[amount:] + self._bits[:amount])
+        return self.__class__(self._bits[amount:] + self._bits[:amount])
 
 class Byte(Word):
     def __init__(self, bits):
@@ -590,8 +590,6 @@ class Byte(Word):
     def __add__(self, other):
         result, _ = super().__sum__(other)
         return result
-    def ror(self, amount):
-        return Word(self._bits[amount:] + self._bits[:amount])
     @staticmethod
     def from_uint(v):
         bits = []
