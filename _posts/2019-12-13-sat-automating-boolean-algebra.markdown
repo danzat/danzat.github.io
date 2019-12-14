@@ -12,9 +12,9 @@ So I thought I might try and build my own logic proof engine so I can play aroun
 
 Before I dive in, I'll quickly describe the problem, and then break it down into steps.
 
-### Motivation
+# Motivation
 
-My original problem was to check whether a list of arithmetic and logic operations can produce a certain result. In other words __Is it possible that output X was produced by a program P?__
+My original problem was to check whether a list of arithmetic and logic operations can produce a certain result. In other words _"Is it possible that output X was produced by a program P?"_
 
 So what's a program? It's a series of instructions that manipulate a state. The initial state can be thought of as an input, and the final state (or some part of it) is the output.
 
@@ -28,7 +28,7 @@ word = 00000000 00000000 00000000 abcdefgh
 
 At each step of the program, the bits of the word get "tangled" and accrue logic complexity.
 
-For example, if we want to add 1 to the following 8bit number: `(0, a, 0, a, 0, a, 0, a)`, we will use a full adder (LINK), which will result in `(0, a, 0, a, 0, a, a, a⊕1)` (with `⊕` being the XOR operation).
+For example, if we want to add 1 to the following 8bit number: `(0, a, 0, a, 0, a, 0, a)`, we will use a [full adder](https://en.wikipedia.org/wiki/Adder_(electronics)), which will result in `(0, a, 0, a, 0, a, a, a⊕1)` (with `⊕` being the XOR operation).
 
 It's easy to see that with non trivial computations, the logical expressions for each bit can get very complex.
 
@@ -40,7 +40,7 @@ I chose to implement everything in Python as it's very easy to code and is highl
 
 ## Boolean Algebra
 
-# Bit
+### Bit
 
 The basic building block will be a boolean variable. All a variable has is a name:
 
@@ -52,7 +52,7 @@ class Bit:
         return self._name
 ```
 
-# The And/Or Operators
+### The And/Or Operators
 
 The next thing we would want to do is perform operations on these variables. There are two basic operators in boolean algebra: "∨" (or) and "∧" (and).
 
@@ -161,7 +161,7 @@ class Clause(BooleanExpression):
         self._operands = list(map(fn, self))
 ```
 
-# Associativity (a.k.a. flattening)
+### Associativity (a.k.a. flattening)
 
 What this basically means is flattening nested operators of the same type. This is true for both `And` and `Or`:
 
@@ -186,7 +186,7 @@ class Clause(BooleanExpression):
 (a ∧ b ∧ c ∧ d)
 ```
 
-# Commutativity & Idempotence (a.k.a. remove duplicates)
+### Commutativity & Idempotence (a.k.a. remove duplicates)
 
 In the previous section, we saw that a flat expression can still be simplified by removing duplicates (idempotence). To do that we need to find them. The easiest way would be to rearrange the order of the clause so that similar variables appear together. This would make it easy to spot duplicates.
 
@@ -264,9 +264,14 @@ class Clause(BooleanExpression):
             if result and result[-1] == operand:
                 continue # Drop the duplicate
             result.append(operand)
-        return self.__class__(*result)
-    def simplify(self):
+        return result
+    def _simplify(self):
         return self.flatten().remove_duplicates()
+    def simplify(self):
+        result = self._simplify()
+        if len(result) == 1:
+            return result[0]
+        return self.__class__(*result)
 
 >>> a | b | a | b
 (((a ∨ b) ∨ a) ∨ b)
@@ -274,7 +279,7 @@ class Clause(BooleanExpression):
 (a ∨ b)
 ```
 
-# Distributivity
+### Distributivity
 
 Suppose we are walking over the operands of an And clause and we encounter an Or:
 
@@ -289,7 +294,7 @@ class And(Clause):
     # ...
     def simplify(self):
         result = []
-        for operand in super(And, self).simplify():
+        for operand in self._simplify():
             if isinstance(operand, Or):
                 temp = A(*result)
                 distributed = [A(temp, subop) for subop in operand]
@@ -311,7 +316,7 @@ Let's try with the initial example:
 
 Exactly like the manual calculation!
 
-## Not
+### Not
 
 So far we have ignored the Not(¬) operation. Let's work it in:
 
@@ -367,7 +372,7 @@ class Not(BooleanExpression):
 a
 ```
 
-# De-Morgan
+### De-Morgan
 
 We have two more simplification rules for Not. Namely, the [De-Morgan laws](https://en.wikipedia.org/wiki/De_Morgan%27s_laws):
 1. ¬(a ∧ b) = ¬a ∨ ¬b
@@ -394,7 +399,7 @@ class Not(BooleanExpression):
 (¬a ∨ ¬b ∨ c)
 ```
 
-# XOR
+### XOR
 
 We can also define a convenience method for the XOR operation:
 
@@ -405,7 +410,7 @@ class BooleanExpression:
         return (self & ~other) | (~self & other)
 ```
 
-# Identity, Null and Cancellation
+### Identity, Null and Cancellation
 
 Now, we want to be able to cancel things out. What does canceling out mean? It depends on the operator:
 - a ∧ ¬a = 0
@@ -446,7 +451,7 @@ class Not(BooleanExpression):
             return self
 ```
 
-For the And and Or rules, we can notice a certain common pattern, namely, for each operator there's one literal that's neutral to the operator, and another that "nullifies" it:
+For the ∧(And) and ∨(Or) rules, we can notice a certain common pattern, namely, for each operator there's one literal that's neutral to the operator, and another that "nullifies" it:
 
 ```python
 class Clause(BooleanExpression):
@@ -456,13 +461,14 @@ class Clause(BooleanExpression):
         for operand in sorted(self):
             if result and result[-1] == operand:
                 continue # Drop the duplicate
-            elif result and ~result[-1] == operand:
+            elif result and simplify(~result[-1]) == operand:
                 result = [self.NULL]
                 break
             elif operand == self.IDENTITY:
                 continue # Does nothing to the result
             elif operand == self.NULL:
                 result = [self.NULL]
+                break
             else:
                 result.append(operand)
         if not result:
@@ -478,9 +484,14 @@ class Or(Clause):
     # ...
     NULL = TRUE
     IDENTITY = FALSE
+
+>>> a ^ a
+((a ∧ ¬a) ∨ (¬a ∧ a))
+>>> simplify(a ^ a)
+0
 ```
 
-### N-bit word
+# N-bit word
 
 Now that we have all the basic building blocks ready, let's try and put this mechanism to work. We'll define a word as an array of bits:
 
@@ -490,6 +501,8 @@ class Word:
         self._bits = bits
     def __iter__(self):
         return iter(self._bits))
+    def __repr__(self):
+        return '{' + ', '.join(map(repr, self)) + '}'
 ```
 
 What can we do with it? We can implement addition ([full adder](https://en.wikipedia.org/wiki/Adder_(electronics)))!
@@ -499,9 +512,88 @@ class Word:
     # ...
     def __add__(self, other):
         carry = FALSE
-        res = []
-        for a, b in zip(self, other):
-            res.append(a ^ b ^ carry)
+        result = []
+        for a, b in zip_longest(self, other):
+            if a is None:
+                a = FALSE
+            if b is None:
+                b = FALSE
+            result.append(a ^ b ^ carry)
             carry = (a & b) | (carry & (a ^ b))
-        return Word(map(simplify, res), simplify(carry)
+        return Word(map(simplify, result)), simplify(carry)
+
+>>> x = Word([a, a, a])
+>>> x
+{a, a, a}
+>>> x + x
+({0, a, a}, a)
+>>> one = Word([TRUE])
+>>> x + one
+({¬a, 0, 0}, a)
+>>> Word([a, b]) + Word([c, d])
+({((a ∧ ¬c) ∨ (¬a ∧ c)), ((¬a ∧ b ∧ ¬d) ∨ (¬a ∧ ¬b ∧ d) ∨ (b ∧ ¬c ∧ ¬d) ∨ (¬b ∧ ¬c ∧ d) ∨ (a ∧ b ∧ c ∧ d) ∨ (a ∧ ¬b ∧ c ∧ ¬d))}, ((b ∧ d) ∨ (a ∧ b ∧ c ∧ ¬d) ∨ (a ∧ ¬b ∧ c ∧ d)))
 ```
+
+
+What can we do with this? Well, just as an example, let's take the following function on an 8bit number:
+
+```c
+uint8_t hash(uint8_t n)
+{
+    return n + (n ^ 37) + (ror(n, 3) & 201);
+}
+```
+
+We can ask, is it possible this computation gives as the result 107?
+
+To do that, we can contruct the exact expression for the result of this function.
+
+First, let's buff the capabilities of our `Word`:
+
+```python
+class Word:
+    # ...
+    def __and__(self, other):
+        return Word([simplify(x & y) for x, y in zip(self, other)])
+    def __xor__(self, other):
+        return Word([simplify(x ^ y) for x, y in zip(self, other)])
+    def ror(self, amount):
+        return Word(self._bits[amount:] + self._bits[:amount])
+    @staticmethod
+    def from_uint(v, n):
+        bits = []
+        for i in range(n):
+            bits.append(Literal(v % 2))
+            v = v // 2
+        return Word(bits)
+```
+
+Now we can do this:
+
+```python
+def hash(n):
+    a = n
+    a, _ = a + (n ^ Word.from_uint(37, 8))
+    a, _ = a + (n.ror(3) & Word.from_uint(201, 8))
+    return a
+
+>>> hash(Word([a, b, c, d, e, f, g, h]))
+{¬d, d, ¬b, ((b ∧ ¬g) ∨ (¬b ∧ g)), ((¬b ∧ d) ∨ (d ∧ ¬g) ∨ (b ∧ ¬d ∧ g)), ((¬b ∧ ¬e) ∨ (¬d ∧ ¬e) ∨ (¬e ∧ ¬g) ∨ (b ∧ d ∧ e ∧ g)), ((¬b ∧ e) ∨ (¬b ∧ ¬d ∧ e) ∨ (b ∧ ¬d ∧ ¬e) ∨ (¬b ∧ e) ∨ (¬b ∧ e ∧ ¬g) ∨ (b ∧ ¬e ∧ ¬g)), ((¬b ∧ ¬c ∧ g) ∨ (¬b ∧ c ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬d ∧ g) ∨ (¬b ∧ c ∧ ¬d ∧ ¬g) ∨ (¬c ∧ ¬d ∧ ¬e ∧ g) ∨ (c ∧ ¬d ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ e ∧ g) ∨ (¬b ∧ c ∧ e ∧ ¬g) ∨ (¬b ∧ c ∧ ¬g) ∨ (c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (b ∧ ¬c ∧ e ∧ ¬g) ∨ (b ∧ c ∧ e ∧ g) ∨ (b ∧ c ∧ d ∧ ¬e ∧ g))}
+```
+
+We want this array of bits to have some concrete value:
+
+```python
+>>> for x, y in zip(hash(n), Word.from_uint(107, 8)):
+    print(f'{y} = {x}')
+1 = ¬d
+1 = d
+0 = ¬b
+1 = ((b ∧ ¬g) ∨ (¬b ∧ g))
+0 = ((¬b ∧ d) ∨ (d ∧ ¬g) ∨ (b ∧ ¬d ∧ g))
+1 = ((¬b ∧ ¬e) ∨ (¬d ∧ ¬e) ∨ (¬e ∧ ¬g) ∨ (b ∧ d ∧ e ∧ g))
+1 = ((¬b ∧ e) ∨ (¬b ∧ ¬d ∧ e) ∨ (b ∧ ¬d ∧ ¬e) ∨ (¬b ∧ e) ∨ (¬b ∧ e ∧ ¬g) ∨ (b ∧ ¬e ∧ ¬g))
+0 = ((¬b ∧ ¬c ∧ g) ∨ (¬b ∧ c ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬d ∧ g) ∨ (¬b ∧ c ∧ ¬d ∧ ¬g) ∨ (¬c ∧ ¬d ∧ ¬e ∧ g) ∨ (c ∧ ¬d ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ e ∧ g) ∨ (¬b ∧ c ∧ e ∧ ¬g) ∨ (¬b ∧ c ∧ ¬g) ∨ (c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (b ∧ ¬c ∧ e ∧ ¬g) ∨ (b ∧ c ∧ e ∧ g) ∨ (b ∧ c ∧ d ∧ ¬e ∧ g))
+```
+
+So we essentially have a system of boolean equations with 8 variables (`a` through `h`) and we want to know if there's a solution...but that's enough for now, next time we'll explore how to solve such a system.
