@@ -284,7 +284,7 @@ a ∧ b ∧ c ∧ (e ∨ f)
 
 We want to take all the operands we encountered up till then (`a ∧ b ∧ c`) consider them a single clause (`x = a ∧ b ∧ c`) and distribute the expression `x ∧ (e ∨ f)`:
 
-```
+```python
 class And(Clause):
     # ...
     def simplify(self):
@@ -317,21 +317,168 @@ So far we have ignored the Not(¬) operation. Let's work it in:
 
 ```python
 class Not(BooleanExpression):
-    def __init__(self, expression):
-        self._expression = expression
+    ORDER = 1
+    def __init__(self, operand):
+        self._operand = operand
     def __repr__(self):
-        return f'¬{self._expression}'
+        return f'¬{self._operand}'
 
 class BooleanExpression:
     # ...
     def __invert__(self):
         return Not(self)
 ```
-# XOR
+
+We can think about the Not operator as if it "does" something to its inner operand.
+
+For example, we can say a Bit can have an additional property of being inverted:
+
+```python
+class Bit(BooleanExpression):
+    def __init__(self, name, inverted = False):
+        self._name = name
+        self._inverted = inverted
+    def __repr__(self):
+        sign = '¬{' if self._inverted else ''
+        return f'{sign}{self._name}'
+    def equals(self, other):
+        return self._inverted == other._inverted and self._name == other._name
+```
+
+We can now define the following simplification rules for Not:
+
+```python
+class Not(BooleanExpression):
+    # ...
+    def simplify(self):
+        inner = self._operand
+        if isinstance(inner, Bit):
+            return Bit(expr._name, not expr._inverted)
+        elif isinstance(inner, Not):
+            return inner.operand
+        else:
+            return self
+
+>>> ~a
+¬a
+>>> ~~a
+¬¬a
+>>> simplify(_)
+a
+```
 
 # De-Morgan
 
+We have two more simplification rules for Not. Namely, the [De-Morgan laws](https://en.wikipedia.org/wiki/De_Morgan%27s_laws):
+1. ¬(a ∧ b) = ¬a ∨ ¬b
+2. ¬(a ∨ b) = ¬a ∧ ¬b
+
+```python
+class Not(BooleanExpression):
+    # ...
+    def simplify(self):
+        inner = self._operand
+        # ...
+        elif isinstance(inner, Or):
+            return simplify(And(*[Not(op) for op in inner]))
+        elif isinstance(inner, And):
+            return simplify(Or(*[Not(op) for op in inner]))
+        else:
+            return self
+
+>>> a & b & ~c
+((a ∧ b) ∧ ¬c)
+>>> ~(a & b & ~c)
+¬((a ∧ b) ∧ ¬c)
+>>> simplify(_)
+(¬a ∨ ¬b ∨ c)
+```
+
+# XOR
+
+We can also define a convenience method for the XOR operation:
+
+```python
+class BooleanExpression:
+    # ...
+    def __xor__(self, other):
+        return (self & ~other) | (~self & other)
+```
+
 # Identity, Null and Cancellation
+
+Now, we want to be able to cancel things out. What does canceling out mean? It depends on the operator:
+- a ∧ ¬a = 0
+- a ∨ ¬a = 1
+
+First let's add these new literals to our code:
+
+```python
+class Literal(BooleanExpression):
+    ORDER = 0
+    def __init__(self, value):
+        self._value = value
+    def __repr__(self):
+        return repr(self._value)
+
+FALSE = Literal(0)
+TRUE = Literal(1)
+```
+
+These new literals have their own unique properties with regard to operators:
+- ¬0 = 1
+- ¬1 = 0
+- a ∧ 0 = 0
+- a ∧ 1 = a
+- a ∨ 0 = a
+- a ∨ 1 = 1
+
+```python
+class Not(BooleanExpression):
+    def simplify(self):
+        inner = self._operand
+        # ...
+        elif inner == TRUE:
+            return FALSE
+        elif inner == FALSE:
+            return TRUE
+        else:
+            return self
+```
+
+For the And and Or rules, we can notice a certain common pattern, namely, for each operator there's one literal that's neutral to the operator, and another that "nullifies" it:
+
+```python
+class Clause(BooleanExpression):
+    # ...
+    def remove_duplicates(self):
+        result = []
+        for operand in sorted(self):
+            if result and result[-1] == operand:
+                continue # Drop the duplicate
+            elif result and ~result[-1] == operand:
+                result = [self.NULL]
+                break
+            elif operand == self.IDENTITY:
+                continue # Does nothing to the result
+            elif operand == self.NULL:
+                result = [self.NULL]
+            else:
+                result.append(operand)
+        if not result:
+            result = [self.IDENTITY]
+        return self.__class__(*result)
+
+class And(Clause):
+    # ...
+    NULL = FALSE
+    IDENTITY = TRUE
+
+class Or(Clause):
+    # ...
+    NULL = TRUE
+    IDENTITY = FALSE
+```
 
 ### N-bit word
 
@@ -356,5 +503,5 @@ class Word:
         for a, b in zip(self, other):
             res.append(a ^ b ^ carry)
             carry = (a & b) | (carry & (a ^ b))
-        return Byte(map(simplify, res)), simplify(carry)
+        return Word(map(simplify, res), simplify(carry)
 ```
