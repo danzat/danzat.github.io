@@ -32,9 +32,7 @@ For example, if we want to add 1 to the following 8bit number: `(0, a, 0, a, 0, 
 
 It's easy to see that with non trivial computations, the logical expressions for each bit can get very complex.
 
-(CONTINUE TALKING ABOUT CNF AND SAT SOLVING)
-
-So, step #1: we need a way to comfortably construct parametric logic expression. We will also need a way to simplify them to a certain form (LINK TO CNF)
+So, step #1: we need a way to comfortably construct parametric logic expression. We will also need a way to simplify them to a certain form (called [Disjunctive Normal Form](https://en.wikipedia.org/wiki/Disjunctive_normal_form), but we'll talk about it later).
 
 I chose to implement everything in Python as it's very easy to code and is highly expressive.
 
