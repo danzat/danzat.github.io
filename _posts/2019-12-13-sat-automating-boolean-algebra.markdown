@@ -630,9 +630,9 @@ Let's try to solve manually (I will use {%raw%}$\top${%endraw%} to indicate a tr
 1. {%raw%}$1 = \neg d \Rightarrow d = 0${%endraw%}
 2. {%raw%}$0 = d \Rightarrow \top${%endraw%}
 3. {%raw%}$0 = \neg b \Rightarrow b = 1${%endraw%}
-4. {%raw%}$1 = (b \wedge \neg g) \vee (\neg b \wedge g) = 1 \vee g = g \Rightarrow g = 1${%endraw%}
-5. {%raw%}$1 = (\neg b \wedge d) \vee (d \wedge \neg g) \vee (b \wedge \neg d \wedge g) = 0 \vee \neg g \vee 1 = 0 \Rightarrow \bot${%endraw%}
+4. {%raw%}$1 = (b \wedge \neg g) \vee (\neg b \wedge g) = \neg g \vee 0 = \neg g \Rightarrow g = 0${%endraw%}
+5. {%raw%}$1 = (\neg b \wedge d) \vee (d \wedge \neg g) \vee (b \wedge \neg d \wedge g) = 0 \vee 0 \vee g = g \Rightarrow \bot${%endraw%}
 
-We don't need to continue because we have reached a contradiction. Therefore there is no possible solution for this system of equations, so there exists no number n so that {%raw%}$hash(n) = 249${%endraw%}.
+We don't need to continue because we have reached a contradiction ("g" can't be both 0 and 1). Therefore there is no possible solution for this system of equations, so there exists no number n so that {%raw%}$hash(n) = 249${%endraw%}.
 
 The manual process of working out each equation, extracting invariants and evaluating expressions is something that we would want to automate, much like the process of simplifying boolean expressions. This will be the topic of the following post.
