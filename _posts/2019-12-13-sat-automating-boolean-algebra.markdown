@@ -624,4 +624,15 @@ We want this array of bits to have some concrete value:
 1 = ((¬b ∧ ¬c ∧ g) ∨ (¬b ∧ c ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬d ∧ g) ∨ (¬b ∧ c ∧ ¬d ∧ ¬g) ∨ (¬c ∧ ¬d ∧ ¬e ∧ g) ∨ (c ∧ ¬d ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ e ∧ g) ∨ (¬b ∧ c ∧ e ∧ ¬g) ∨ (¬b ∧ c ∧ ¬g) ∨ (c ∧ ¬e ∧ ¬g) ∨ (¬b ∧ ¬c ∧ ¬e ∧ g) ∨ (¬b ∧ c ∧ ¬e ∧ ¬g) ∨ (b ∧ ¬c ∧ e ∧ ¬g) ∨ (b ∧ c ∧ e ∧ g) ∨ (b ∧ c ∧ d ∧ ¬e ∧ g))
 ```
 
-So we essentially have a system of boolean equations with 8 variables (`a` through `h`) and we want to know if there's a solution...but that's enough for now, next time we'll explore how to solve such a system.
+So we essentially have a system of boolean equations with 8 variables (`a` through `h`) and we want to know if there's a solution.
+
+Let's try to solve manually (I will use {%raw%}$\top${%endraw%} to indicate a truth statement, and to {%raw%}$\bot${%endraw%} indicate a contradiction):
+1. {%raw%}$1 = \neg d \Rightarrow d = 0${%endraw%}
+2. {%raw%}$0 = d \Rightarrow \top${%endraw%}
+3. {%raw%}$0 = \neg b \Rightarrow b = 1${%endraw%}
+4. {%raw%}$1 = (b \wedge \neg g) \vee (\neg b \wedge g) = 1 \vee g = g \Rightarrow g = 1${%endraw%}
+5. {%raw%}$1 = (\neg b \wedge d) \vee (d \wedge \neg g) \vee (b \wedge \neg d \wedge g) = 0 \vee \neg g \vee 1 = 0 \Rightarrow \bot${%endraw%}
+
+We don't need to continue because we have reached a contradiction. Therefore there is no possible solution for this system of equations, so there exists no number n so that {%raw%}$hash(n) = 249${%endraw%}.
+
+The manual process of working out each equation, extracting invariants and evaluating expressions is something that we would want to automate, much like the process of simplifying boolean expressions. This will be the topic of the following post.
