@@ -6,7 +6,7 @@ date:   2019-10-22
 categories: algorithms simulation
 ---
 
-As I'm writing this blog about something I did almost 3 years ago, I'm having some trouble remembering the exact circumstances that led me to simulate traffic in a city. However, the general direction was that I was interested in measuring how certain parameters (speed-limit, driver reaction-time, vehicle density etc...) effect congestion (and btw, the definition of congestion is also not trivial).
+As I'm writing this blog about something I did almost 3 years ago, I'm having some trouble remembering the exact circumstances that led me to simulate traffic in a city. However, the general direction was that I was interested in measuring how certain parameters (speed-limit, driver reaction-time, vehicle density etc...) affect congestion (and btw, the definition of congestion is also not trivial).
 
 So, the basic idea is to have some representation of a map - a graph of streets with various metadata, and on this map, vehicles would spawn, and follow some simple rules that model a driver (accelerate to meet the speed limit, decelerate/break when entering a junction or in response to a vehicle in front).
 
@@ -122,9 +122,31 @@ The node coordinates are all angular - longitude and latitude. However, on the g
 
 There is an entire science to measuring the earth. But I wanted to choose something simple.
 
-Basically what I did was take the lon/lat bounding box the of map, imagine there's a tangent surface to the earth at the center of that box, and then project the nodes onto that surface. This way I can have a 2-dimensional coordinate system on that surface which I can use as east/north coordinates,
+Basically what I did was take the lon/lat bounding box the of map. This describes a part of the earth's shell:
 
-So, first, I want to convert lon/lat coordinates to a 3d point on the surface of earth's sphere. These are just [Spherical Coordinates](https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates)
+![Shell](/assets/traffic/shell.png){: .center-image }
+
+Now, we draw a plane tangent to the earth at the center of that "shell":
+
+![Shell and Plane](/assets/traffic/shell-and-plane.png){: .center-image }
+
+Now, suppose we have a point {% raw %} $ \vec E$ {% endraw %} on the earth's surface:
+
+![Point on earth](/assets/traffic/earth-point.png){: .center-image }
+
+We will cast a ray from the center of the earth to that point, and continue tracing it until it intersects with the plane (or map if you will) at {% raw %} $ \vec M$ {% endraw %}:
+
+![Earth to Map](/assets/traffic/earth-to-map.png){: .center-image }
+
+We now have a 1-to-1 mapping from points on the surface of the earth to points on a flat map!
+
+On the surface of the map, we can have east/north axis and thus a 2D coordinate system.
+
+So, first, I want to convert lon/lat coordinates to a 3d point on the surface of earth's sphere. These are just [Spherical Coordinates](https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates):
+
+{% raw %}
+$$ \hat{r}(lon, lat) = (\cos(\theta) \cos(\phi), \cos(\theta) \sin(\phi), \sin(\theta)) $$
+{% endraw %}
 
 ```python
 def vector3_from_lon_lat(lon, lat):
@@ -134,9 +156,9 @@ def vector3_from_lon_lat(lon, lat):
     return (math.cos(p) * math.cos(l), math.cos(p) * math.sin(l), math.sin(p))
 ```
 
-What this would give us is the normal to the tangent plane.
+What this would give us is the normal to the tangent plane: {%raw%}$\hat n_0 = \hat r(\frac{\pi}{180}lon, \frac{\pi}{180}lat)${%endraw%}. Which will give us the following equation for the tangent plane:
 
-Now we need the north and east facing unit-vectors on the plane so we can use them as basis vectors:
+{% raw %} $$ \vec r \cdot \hat n_0 = \hat r_0 \cdot \hat n_0 = R_E $$ {% endraw %}
 
 ```python
 # Bounding box
@@ -150,16 +172,42 @@ lon_0 = (minlon + maxlon) / 2
 lat_0 = (minlat + maxlat) / 2
 
 n_0 = vector3_from_lon_lat(lon_0, lat_0)
+```
 
+Now we can take the {% raw %}$\hat z${% endraw %} and project it onto the tangent plane to get a "north" vector:
+
+{% raw %}$$ \vec N = \hat z - \left(\hat z \cdot \hat n_0\right) \hat n_0 $${% endraw %}
+
+```python
 z = (0, 0, 1) # "real" north: points to the north pole
 
 north_0 = sub3(z, scale3(n_0, dot3(z, n_0))) # Project north onto the tangent plane
 north_0 = scale3(north_0, 1 / norm3(north_0)) # Normalize
+```
 
+East is then obtained by using a cross product (right-hand rule):
+
+{% raw %}$$ \hat E = \hat N \times \hat n_0 = \frac{\vec N}{\left\Vert\vec N\right\Vert} \times \hat n_0 $${% endraw %}
+
+```python
 east_0 = cross3(north_0, n_0) # Right-hand rule
 ```
 
-Now for each lon/lat coordinate, we scale it using earth's radius (6.317e6[m]) towards the plane and then find the decompose to our north and south:
+The north and east facing unit-vectors on the plane will be used as basis vectors.
+
+Now for each lon/lat coordinate, we scale it using earth's radius (6.317e6[m]) towards the plane:
+
+{% raw %}$$ \vec r (t) = t \hat r (\theta, \phi) $${% endraw %}
+
+If we plug this into the equation for the tangent plane:
+
+{% raw %} $$ \left(t \hat r (\theta, \phi)\right) \cdot \hat n_0 = R_E \Rightarrow t = \frac{R_E}{\hat r (\theta, \phi) \cdot \hat n_0}$$ {% endraw %}
+
+Which gives us the following intersection point on the plane:
+
+{% raw %} $$ \vec r = \frac{R_E}{\hat r (\theta, \phi) \cdot \hat n_0} \hat r (\theta, \phi) $$ {% endraw %}
+
+We can then decompose to north and south coordinates (in meters!):
 
 ```python
 n = vector3_from_lon_lat(lon, lat)
@@ -169,4 +217,4 @@ u = dot3(x, north_0)
 v = dot3(x, east_0)
 ```
 
-That's it so far, then time we'll talk about setting up a simulation.
+That's it so far, next time we'll talk about setting up a simulation.
