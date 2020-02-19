@@ -89,17 +89,25 @@ $$ {%endraw%}
 
 As it happens, we are going to run into the following problem a lot: We have a plane in 3d space which is our viewport. This viewport is also the screen, and we want to know the coordinates of a point on the plane which will be translated to pixel coordinates on the screen.
 
-Suppose we have a viewer positioned at point {%raw%} $\vec V$ {%endraw%} looking in the direction {%raw%} $\hat D$ {%endraw%} at a viewport (or screen) at distance {%raw%} $l$ {%endraw%} from the viewer.
+Suppose we have a viewer positioned at point {%raw%} $\vec V$ {%endraw%} looking in the direction {%raw%} $\hat D$ {%endraw%} (with an *up* direction {%raw%} $\hat u$ {%endraw%}) at a viewport (or screen) at distance {%raw%} $l$ {%endraw%} from the viewer:
 
-Now, there is some point in space (with the viewport between the point and the viewer) we'll call {%raw%} $\vec x$ {%endraw%}, and we want to trace a ray between the viewer {%raw%} $\vec V$ {%endraw%} and the point {%raw%} $\vec x$ {%endraw%} and find the viewport coordinates of the intersection of therawwith the viewport.
+![Obvserver](/assets/perspective/observer.png){: .center-image }
+
+Now, there is some point in space (with the viewport between the point and the viewer) we'll call {%raw%} $\vec P$ {%endraw%}, and we want to trace a ray between the viewer {%raw%} $\vec V$ {%endraw%} and the point {%raw%} $\vec P$ {%endraw%} and find the viewport coordinates of the intersection of the ray with the viewport:
+
+![Raytrace](/assets/perspective/raytrace.png){: .center-image }
 
 {%raw%} $$
-\vec \Delta = \vec x - \vec V \\
+\vec \Delta = \vec P - \vec V \\
 \alpha = \frac{l}{\hat D \cdot \vec \Delta} \\
-\vec x_{viewport} = \vec V + \alpha \Delta = \vec V + \frac{l}{\hat D \cdot \left(\vec x - \vec V\right)} \left(\vec x - \vec V\right)
+\vec P_{viewport} = \vec V + \alpha \Delta = \vec V + \frac{l}{\hat D \cdot \left(\vec P - \vec V\right)} \left(\vec P - \vec V\right)
 $$ {%endraw%}
 
-We can now find the local coordinates of {%raw%}$\vec x_{viewport}${%endraw%} on the viewer plane - these are the pixel coordinates on the screen!
+We can now find the local coordinates of {%raw%}$\vec P_{viewport}${%endraw%} on the viewer plane - these are the pixel coordinates on the screen!
+
+For example, a triangle in space is composed of three segments. The coordinates of the segment edges are projected onto the viewport, and then rendered to produce the image of the triangle as seen by that viewer:
+
+![Triangle](/assets/perspective/triangle.png){: .center-image }
 
 ## Getting Down To Brass Tacks
 
