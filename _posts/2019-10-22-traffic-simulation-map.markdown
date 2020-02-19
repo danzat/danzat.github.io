@@ -140,6 +140,25 @@ We will cast a ray from the center of the earth to that point, and continue trac
 
 We now have a 1-to-1 mapping from points on the surface of the earth to points on a flat map!
 
+Now we need a way to get 2D coordinates. To do that we need to select axes.
+
+We start with a north "hint", we can use the {% raw %} $\hat z $ {% endraw %} vector as it points at the north pole. Obviously, this vector does not fit in map, but sticks out of it. We want to take the component of {% raw %} $\hat z $ {% endraw %} that's embedded in the map and use that as "north". Generally, a vector can be decomposed in relation to a plane to a perpendicular (in the direction of the plane's normal) and transverse (embedded in the plane, and thus perpendicular to the normal) {% raw %} $\hat z $ {% endraw %}:
+
+{% raw %} $$ \hat z = \vec z_{\parallel} + \vec z_{\bot} $$ {% endraw %}
+
+Since {% raw %} $\vec z_{\parallel} $ {% endraw %} is perpendicular to {% raw %} $\hat n $ {% endraw %}, then {% raw %} $\vec z_{\parallel} \cdot \hat n = 0 $ {% endraw %}.
+
+In addition, {% raw %} $\vec z_{\bot} $ {% endraw %} is in the direction of {% raw %} $\hat n $ {% endraw %}, so we can write it as: {% raw %} $\vec z_{\bot} = \alpha \hat n $ {% endraw %}
+
+We can now use all that to extract {% raw %} $\vec z_{\parallel} $ {% endraw %} (which will serve as the plane's north):
+
+{% raw %} $$
+\begin{eqnarray*}
+\hat z \cdot \hat n & = & \vec z_{\parallel} \cdot \hat n + \vec z_{\bot} \cdot \hat n
+& = & \alpha
+\end{eqnarray*}
+$$ {% endraw %}
+
 On the surface of the map, we can have east/north axis and thus a 2D coordinate system.
 
 So, first, I want to convert lon/lat coordinates to a 3d point on the surface of earth's sphere. These are just [Spherical Coordinates](https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates):
