@@ -254,4 +254,4 @@ with LaTeXRenderer(SphericalCamera(10, deg2rad(-15), deg2rad(30), 4)) as ctx:
     draw_right_angle(ctx, midpoint, u, v, 0.1)
 ```
 
-The code for `latexrendered.py` and some examples is available in [this repository](https://www.github.com/danzat/latexrenderer)
+The code for `latexrendered.py` and some examples is available in [this repository](https://github.com/danzat/3dpp)
