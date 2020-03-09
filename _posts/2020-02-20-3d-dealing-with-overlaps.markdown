@@ -150,12 +150,12 @@ $${%endraw%}
 
 We will now cast a ray from the viewer ({%raw%}$\vec V${%endraw%}) through {%raw%}$\vec m${%endraw%}:
 
-{%raw%} $$ \vec R = \vec V + \alpha \left(\vec m - \vec V\right) $$ {%endraw%}
+{%raw%} $$ \vec M = \vec V + \alpha \left(\vec m - \vec V\right) $$ {%endraw%}
 
 This should intersect with the each of the segments at points which correspond to {%raw%}$\vec m${%endraw%} on the screen.
 
 {%raw%}$$
-\vec R(\alpha) = \vec A + t \left(\vec B - \vec A\right) \\
+\vec M(\alpha) = \vec A + t \left(\vec B - \vec A\right) \\
 \vec V + \alpha \left(\vec m - \vec V\right) = \vec A + t \left(\vec B - \vec A\right) \\
 \alpha \left(\vec m - \vec V\right) \times \left(\vec B - \vec A\right) = \left(\vec A - \vec V\right) \times \left(\vec B - \vec A\right) \\
 \alpha = \frac{\left|\left(\vec A - \vec V\right) \times \left(\vec B - \vec A\right)\right|}{\left|\left(\vec m - \vec V\right) \times \left(\vec B - \vec A\right)\right|}
@@ -163,7 +163,12 @@ $${%endraw%}
 
 ![Project back](/assets/perspective/step3-project-back.png){: .center-image }
 
-We now just need to compare {%raw%}$\alpha${%endraw%} and {%raw%}$\beta${%endraw%} to determine which segment occludes which.
+We now just need to compare {%raw%}$\alpha${%endraw%} and {%raw%}$\beta${%endraw%} to determine which segment occludes which:
+
+```python
+def sort_segments(segments, observer):
+    pass
+```
 
 ## Complicated occlusion
 
@@ -184,21 +189,31 @@ The strategy is pretty simple:
 
 * Cast all the segments to the screen.
 * For each segment, find all possible intersections with all the other segments.
-* Then, set a break point between each two intersection points.
-* Trace back the point to a point on the 3d segment and break the segment into smaller pieces.
+* Trace back the point to a point on the 3d segment
+
+![3-way intersections](/assets/perspective/segments3way-intersect.png){: .center-image }
+
+* Break the segment into smaller pieces between intersections
+
+![3-way fragmented](/assets/perspective/segments3way-fragment.png){: .center-image }
 
 ```python
-fragmented = []
+fragments = []
 for segment in segments:
-    intersections = [segment.head]
     for other in segments:
         if segment == other:
             continue
         if not intersects(segment, other):
             continue
-        intersections.append(intersect(segment, other))
-    intersections.append(segment.tail)
-    if len(intersections) > 2:
-        midpoints = [(a + b) / 2 for a, b in zip(intersections[:-1], intersections[1:])]
-        fragmented.append(segment.fragment(midpoints))
+        ab = observer.project(segment)
+        cd = observer.project(other)
+        m = intersect_segments(ab, cd)
+        M = intersect_ray_and_segment(observer.position, m, segment)
+        intersections.append(M)
+    if len(intersections) >= 2:
+        midpoints = [(a + b) / 2 for a, b in consecutive_pairs(intersections)]
+        fragments.append(segment.fragment(midpoints))
+sorted_fragments = sort_segments(fragments, observer)
 ```
+
+I went ahead and pushed the new code to the [3dpp repository](https://github.com/danzat/3dpp) together with some other improvements and documentation. Be sure to check it out!
