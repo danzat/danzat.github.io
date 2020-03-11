@@ -47,6 +47,8 @@ $$ {%endraw%}
 
 We now have two peojected segments on the surface of the viewer's plane: {%raw%}$\mathbf{ab}${%endraw%} and {%raw%}$\mathbf{cd}${%endraw%}
 
+### Checking for an intersection
+
 Each segment lies on a line which can be written as:
 
 {%raw%} $$
@@ -56,7 +58,7 @@ $$ {%endraw%}
 If we cross ({%raw%}$\times${%endraw%}) both sides of the equation with {%raw%}$\vec b - \vec a${%endraw%} we can obtain a non-parametric equation for {%raw%}$\vec r${%endraw%} (a.k.a. locus):
 
 {%raw%} $$
-\vec r \times \left(\vec b - \vec a\right) = \vec A \times \left(\vec b - \vec A\right) \\
+\vec r \times \left(\vec b - \vec a\right) = \vec a \times \left(\vec b - \vec a\right) \\
 \Rightarrow \left(\vec r - \vec a\right) \times \left(\vec b - \vec a\right) = \vec 0
 $$ {%endraw%}
 
@@ -87,7 +89,18 @@ $$ {%endraw%}
 
 Of course _right_ and _left_ are arbitrary, but you get the idea.
 
-We can now use this neat criterion to test whether two segments intersect. You can go over all the options yourself, but I claim that {%raw%}$\mathbf{ab}${%endraw%} and {%raw%}$\mathbf{cd}${%endraw%} intersect if:
+There is a total of 16 configuration of both segments in relation to where each vertex lies in relation to the other segment (each vertex can be either to the left or right of the other segment, and there is a total of 4 vertices, so: {%raw%}$2^4=16${%endraw%}). Granted, many of these configuration are equivalent, but just for the sake being thorough, we'll list all of them:
+
+|     |ab=ll|ab=lr|ab=rl|ab=rr|
+|-----+-----------------------|
+|cd=ll|![llll](/assets/perspective/configurations/type0/llll.png){: .center-image }|![lrll](/assets/perspective/configurations/type1/lrll.png){: .center-image }|![rlll](/assets/perspective/configurations/type1/rlll.png){: .center-image }|![rrll](/assets/perspective/configurations/type0/rrll.png){: .center-image }|
+|cd=lr|![lllr](/assets/perspective/configurations/type1/lllr.png){: .center-image }||![rllr](/assets/perspective/configurations/type2/rllr.png){: .center-image }|![rrlr](/assets/perspective/configurations/type1/rrlr.png){: .center-image }|
+|cd=rl|![llrl](/assets/perspective/configurations/type1/llrl.png){: .center-image }|![lrrl](/assets/perspective/configurations/type2/lrrl.png){: .center-image }||![rrrl](/assets/perspective/configurations/type1/rrrl.png){: .center-image }|
+|cd=rr|![llrr](/assets/perspective/configurations/type0/llrr.png){: .center-image }|![lrrr](/assets/perspective/configurations/type1/lrrr.png){: .center-image }|![rlrr](/assets/perspective/configurations/type1/rlrr.png){: .center-image }|![rrrr](/assets/perspective/configurations/type0/rrrr.png){: .center-image }|
+
+As you can see, due to {%raw%}$a \leftrightarrow b${%endraw%}, {%raw%}$c \leftrightarrow d${%endraw%} and {%raw%}$\mathbf{ab} \leftrightarrow \mathbf{cd}${%endraw%} symmetries, there are three configurations (grouped by color), only one of which is that of intersecting segments. The blank cells are impossible configurations (I'll leave this as a thought exercise to you).
+
+As you can see, intersections only occurr if
 
 1. {%raw%}$\vec{a}${%endraw%} and {%raw%}$\vec{b}${%endraw%} are on opposite sides of {%raw%}$\mathbf{cd}${%endraw%} _and_
 2. {%raw%}$\vec{c}${%endraw%} and {%raw%}$\vec{d}${%endraw%} are on opposite sides of {%raw%}$\mathbf{ab}${%endraw%}
@@ -106,6 +119,8 @@ Which means that the conditions for intersection are:
 \textrm{and}\\
 \left\{\left[\left(\vec a - \vec c\right) \times \left(\vec d - \vec c\right)\right] \cdot \hat n\right\} \left\{\left[\left(\vec b - \vec c\right) \times \left(\vec d - \vec c\right)\right] \cdot \hat n\right\} < 0
 $$ {%endraw%}
+
+### Finding the intersection
 
 Ok, now suppose the condition passes and we know there's an intersection, how do we find it?
 
@@ -165,11 +180,6 @@ $${%endraw%}
 
 We now just need to compare {%raw%}$\alpha${%endraw%} and {%raw%}$\beta${%endraw%} to determine which segment occludes which:
 
-```python
-def sort_segments(segments, observer):
-    pass
-```
-
 ## Complicated occlusion
 
 Actually, we're not done yet. Support we have the following situation:
@@ -213,7 +223,12 @@ for segment in segments:
     if len(intersections) >= 2:
         midpoints = [(a + b) / 2 for a, b in consecutive_pairs(intersections)]
         fragments.append(segment.fragment(midpoints))
-sorted_fragments = sort_segments(fragments, observer)
 ```
+
+## Sorting
+
+Now that we have a guarantee that each segment intersects at most one other segment, we can just pair them up, then sort each pair according to their intersection's distance from the viewer.
+
+Since there are no occlusions other than inside pairs, we can just render the list as it is.
 
 I went ahead and pushed the new code to the [3dpp repository](https://github.com/danzat/3dpp) together with some other improvements and documentation. Be sure to check it out!
