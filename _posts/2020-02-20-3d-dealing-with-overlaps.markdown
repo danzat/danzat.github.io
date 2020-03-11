@@ -72,7 +72,9 @@ But we also know that {%raw%}$\vec r${%endraw%} is on the plane, and so both ter
 
 However, "in the direction" can also mean in the opposite direction. What decides whether the product is in the direction of {%raw%}$\hat n${%endraw%} or {%raw%}$-\hat n${%endraw%}?
 
-According to the right hand rule, the rule holds only if the angle between the two vectors is smaller than {%raw%}$180^\circ${%endraw%}. If it's more that that, we need to flip the order of the vectors so that we form the smaller angle between them, and as a consequence, the direction of the product flips.
+According to the right hand rule, the rule holds only if the angle between the two vectors is smaller than {%raw%}$180^\circ${%endraw%}. If it's more that that, we need to flip the order of the vectors so that we form the smaller angle between them, and as a consequence, the direction of the product flips ({%raw%}$\mathbf{ab}${%endraw%} is black, {%raw%}$\vec{r}${%endraw%} is blue and the cross product {%raw%}$\left(\vec r - \vec a\right) \times \left(\vec b - \vec a\right)${%endraw%} is red):
+
+![cross product direction](/assets/perspective/cross.png)
 
 This is very important, because that {%raw%}$180^\circ${%endraw%} angle forms a border: vectors that point to one side will result in a product that's in the direction of {%raw%}$\hat n${%endraw%}, and points on the other side will result in a product in the direction of {%raw%}$-\hat n${%endraw%}, while all the points that lie on the border will result in a product that's perpendicular to {%raw%}$\hat n${%endraw%}.
 
