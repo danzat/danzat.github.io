@@ -2,7 +2,7 @@
 layout: post
 title:  "Perspective Projection"
 subtitle: "Dealing With Overlaps"
-date:   2020-02-07
+date:   2020-03-14
 categories: 3d graphics z-sort painters algorithm
 ---
 
