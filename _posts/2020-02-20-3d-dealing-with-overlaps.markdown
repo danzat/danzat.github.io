@@ -182,6 +182,21 @@ $${%endraw%}
 
 We now just need to compare {%raw%}$\alpha${%endraw%} and {%raw%}$\beta${%endraw%} to determine which segment occludes which:
 
+```python
+V = observer._camera_position
+for i in range(len(segments)):
+    ab = segments[i].project_to(observer)
+    for j in range(i + 1, len(segments)):
+        cd = segments[j].project_to(observer)
+        if not does_intersect(ab.vertices, cd.vertices, observer.screen):
+            continue
+        m = intersect(ab.vertices, cd.vertices)
+        alpha = distance_to_segment(V, m, segments[i].vertices)
+        beta = distance_to_segment(V, m, segments[j].vertices)
+        if alpha < beta:
+            segments[i], segments[j] = segments[j], segments[i]
+```
+
 ## Complicated occlusion
 
 Actually, we're not done yet. Support we have the following situation:
@@ -205,32 +220,40 @@ The strategy is pretty simple:
 
 ![3-way intersections](/assets/perspective/segments3way-intersect.png){: .center-image }
 
-* Break the segment into smaller pieces between intersections
+* Break the segment into smaller pieces between intersections (requires sorting the intersections points)
 
 ![3-way fragmented](/assets/perspective/segments3way-fragment.png){: .center-image }
 
 ```python
+V = observer._camera_position
 fragments = []
-for segment in segments:
-    for other in segments:
+for segment in self._segments:
+    intersections = []
+    for other in self._segments:
         if segment == other:
             continue
-        if not intersects(segment, other):
+        ab = segment.project_to(observer)
+        cd = other.project_to(observer)
+        if not does_intersect(ab.vertices, cd.vertices, observer.screen):
             continue
-        ab = observer.project(segment)
-        cd = observer.project(other)
-        m = intersect_segments(ab, cd)
-        M = intersect_ray_and_segment(observer.position, m, segment)
+        m = intersect(ab.vertices, cd.vertices)
+        M = intersect_ray_with_segment(V, m, segment.vertices)
         intersections.append(M)
-    if len(intersections) >= 2:
-        midpoints = [(a + b) / 2 for a, b in consecutive_pairs(intersections)]
-        fragments.append(segment.fragment(midpoints))
+    if len(intersections) > 1:
+        start = segment.vertices[0]
+        intersections.sort(key=lambda i: (i - start) & (i - start))
+        midpoints = [(a + b) / 2 for a, b in pairwise(intersections)]
+        fragments.extend(segment.fragment(midpoints))
+    else:
+        fragments.append(segment)
+
+segments = sort_segment(fragments)
 ```
 
-## Sorting
+Here's an example that combines all the elements in this article:
 
-Now that we have a guarantee that each segment intersects at most one other segment, we can just pair them up, then sort each pair according to their intersection's distance from the viewer.
-
-Since there are no occlusions other than inside pairs, we can just render the list as it is.
+<video controls autoplay="autoplay" loop="loop" class="center-image">
+  <source src="/assets/perspective/spin.webm" type="video/webm">
+</video>
 
 I went ahead and pushed the new code to the [3dpp repository](https://github.com/danzat/3dpp) together with some other improvements and documentation. Be sure to check it out!
