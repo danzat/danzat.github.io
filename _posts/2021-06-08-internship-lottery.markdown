@@ -10,11 +10,11 @@ Recently my wife, who's studying medicine, had to partake in what's called an "i
 
 Granted, some hospitals are more popular than others, so some students are bound to get disappointed. To keep things fair, there's a lottery. Each student ranks all the hospitals, and then there's an algorithm that takes into account the students' preferences and the hospitals' capacity, and assigns each student to a hospital.
 
-Up till ~2015, the algorithm was an RSD ([Random Serial Dictatorship](https://en.wikipedia.org/wiki/Random_serial_dictatorship), more on that soon), which eventually meant that allocations had a pretty random character. Around 2015 however, there has been an "upgrade" to the algorithm which was supposed to make students more satisfied (as a whole) with their assignments. Needless to say, most students were not satisfied with their assignments, which lead to a kind of _folklore_ of strategies to maximize one's odds of getting their desired assignment(s).
+Up till ~2015, the algorithm was an RSD ([Random Serial Dictatorship](https://en.wikipedia.org/wiki/Random_serial_dictatorship), more on that soon), which eventually meant that allocations had a pretty random character. Around 2015 however, there has been an "upgrade" to the algorithm which was supposed to make students more satisfied (as a whole) with their assignments [^fn1]. Needless to say, many students were not satisfied with their assignments, which lead to a kind of _folklore_ of strategies to maximize one's odds of getting their desired assignment(s).
 
 The researchers' motivation for the new algorithm was to improve the overall satisfaction of students. And before going into details, this changed the aforementioned strategies. And this leads me to my motivations for looking into this thing.
 
-First, as I mentioned, my wife, she's going to participate in this lottery, and we wanted to test different strategies and measure their outcome. Secondary is my curiosity of figuring out of this thing works.
+First, as I mentioned, my wife, she's going to participate in this lottery, and we wanted to test different strategies and measure their outcome. Secondary is my curiosity of figuring out how this thing works.
 
 Before talking about the algorithm, I need to set up some notations.
 
@@ -253,6 +253,8 @@ def birkhoff(Q: np.matrix) -> Iterator[Tuple[int, np.matrix]]:
         Q -= n * P
 ```
 
-# Conclusion
-
 Now that we have a dataset to work on, we can continue with the implementation of the assignment algorithm. Stay tuned.
+
+# References
+
+[^fn1]: Bronfman, S., Hassidim, A., Afek, A. et al. Assigning Israeli medical graduates to internships. Isr J Health Policy Res 4, 6 (2015). [https://doi.org/10.1186/2045-4015-4-6](https://doi.org/10.1186/2045-4015-4-6)
