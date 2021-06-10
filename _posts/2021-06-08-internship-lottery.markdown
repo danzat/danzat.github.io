@@ -40,7 +40,7 @@ If the student ranked hospital j at preference i, then the matrix {%raw%}$\left[
 
 Which means, that if we sum all the permutation matrices of all students, and we look at the resulting matrix at row/colum i/i, we will see how many students made that choice!
 
-{% raw %} $$ Q = \sum_{i=1}^{M} \left[\rho_i\right] $$ {% endraw %}
+{% raw %} $$ Q = \sum_{i=1}^{N} \left[\rho_i\right] $$ {% endraw %}
 
 Why is this insight important? Because if we normalize {%raw%}$Q${%endraw%} by {%raw%}$N${%endraw%}, we get what's called a [Doubly Stochastic Matrix](https://en.wikipedia.org/wiki/Doubly_stochastic_matrix), which according to the Birkhoff–von Neumann theorem can be decomposed in the following manner:
 
