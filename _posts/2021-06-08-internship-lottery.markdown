@@ -221,6 +221,8 @@ from networkx import from_numpy_matrix
 from networkx.algorithms.bipartite.matching import maximum_matching
 
 def birkhoff(Q: np.matrix) -> Iterator[Tuple[int, np.matrix]]:
+    M, _ = Q.shape
+
     while not np.all(Q == 0):
         # 1. Construct the positivity matrix of Q (Qp = Q-positive)
         Qp = np.zeroes_like(Q)
