@@ -133,8 +133,12 @@ class BipartateGraph {
         this.size = this.m.size;
     }
 
-    render(id, width, height, edges) {
-        const ctx = document.getElementById(id).getContext('2d');
+    render(id, edges) {
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext('2d');
+
+        const { width, height } = canvas.getBoundingClientRect();
+        canvas.width = canvas.height * (canvas.clientWidth / canvas.clientHeight);
 
         ctx.clearRect(0, 0, width, height);
 
@@ -175,15 +179,15 @@ class BipartateGraph {
             ctx.fillStyle = "white";
             ctx.fill(l);
             ctx.fill(r);
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.strokeText(String(i), left, y);
             ctx.strokeStyle = "black";
             ctx.stroke(l);
             ctx.stroke(r);
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.strokeText(String.fromCharCode(i + "a".charCodeAt(0)), right, y);
+            ctx.font = `${radius}px serif`;
+            ctx.fillStyle = "black";
+            ctx.fillText(String(i), left, y);
+            ctx.fillText(String.fromCharCode(i + "a".charCodeAt(0)), right, y);
         }
     }
 
@@ -320,8 +324,11 @@ class Demo {
         for (let id of ["matrix", "positivity", "matching", "mask"]) {
             document.getElementById(id).innerText = "";
         }
-        const ctx = document.getElementById("graph").getContext('2d');
-        ctx.clearRect(0, 0, 200, 200);
+        const canvas = document.getElementById("graph");
+        const ctx = canvas.getContext('2d');
+        const { width, height } = canvas.getBoundingClientRect();
+        canvas.width = canvas.height * (canvas.clientWidth / canvas.clientHeight);
+        ctx.clearRect(0, 0, width, height);
     }
 
     stepTitle(text) {
@@ -348,14 +355,14 @@ class Demo {
             case 2: {
                 this.stepTitle("Convert to a bipartate graph");
                 this.G = new BipartateGraph(this.Qp);
-                this.G.render("graph", 200, 200);
+                this.G.render("graph");
                 this.state++;
                 break;
             }
             case 3: {
                 this.stepTitle("Find a maximum matching");
                 this.matching = this.G.maximumMatching();
-                this.G.render("graph", 200, 200, Object.fromEntries(this.matching));
+                this.G.render("graph", Object.fromEntries(this.matching));
                 this.state++;
                 break;
             }
