@@ -1,0 +1,41 @@
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px 1fr;
+    grid-template-rows: 150px 150px 1fr;
+    gap: 10px;
+    grid-template-areas:
+        "a c c d"
+        "b c c e"
+        "f f f f";
+}
+
+#matrix {
+    grid-area: a;
+}
+
+#positivity {
+    grid-area: b;
+}
+
+#canvas-container {
+    grid-area: c;
+    position: relative;
+}
+
+#graph {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+#matching {
+    grid-area: d;
+}
+
+#mask {
+    grid-area: e;
+}
+
+#preferences {
+    grid-area: f;
+}
