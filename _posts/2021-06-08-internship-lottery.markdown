@@ -91,21 +91,21 @@ In this example, we have the allocation matrix of 20 students competing for: May
 Click next to cycle through the iteration of the algorithm and watch the table at the end of the recovered individual preferences:
 
 <div>
-<script>console.log(MathJax);</script>
-<script type="text/javascript" src="/assets/internship-lottery/birkhoff/birkhoff.js"></script>
-<button onclick="demo.next();">Next</button>
-<div id="step"></div>
-    <div class="wrapper">
-    <div id="matrix"></div>
-    <div id="positivity"></div>
-    <div id="canvas-container">
-        <canvas id="graph" height="300px"></canvas>
+    <script>console.log(MathJax);</script>
+    <script type="text/javascript" src="/assets/internship-lottery/birkhoff/birkhoff.js"></script>
+    <button onclick="demo.next();">Next</button>
+    <div id="step"></div>
+    <div class="birkhoff">
+        <div id="matrix"></div>
+        <div id="positivity"></div>
+        <div id="canvas-container">
+            <canvas id="graph" height="300px"></canvas>
+        </div>
+        <div id="matching"></div>
+        <div id="mask"></div>
+        <table id="preferences"></table>
     </div>
-    <div id="matching"></div>
-    <div id="mask"></div>
-    <table id="preferences"></table>
-</div>
-<script type="text/javascript">let demo = new Demo(["Mayo Clinic", "Johns Hopkins", "Charité", "MGH"], 20);</script>
+    <script type="text/javascript">let demo = new Demo(["Mayo Clinic", "Johns Hopkins", "Charité", "MGH"], 20);</script>
 </div>
 
 ### Implementation

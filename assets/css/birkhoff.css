@@ -1,4 +1,4 @@
-.wrapper {
+.birkhoff {
     display: grid;
     grid-template-columns: 1fr 100px 100px 1fr;
     grid-template-rows: 150px 150px 1fr;
@@ -9,33 +9,33 @@
         "f f f f";
 }
 
-#matrix {
+.birkhoff #matrix {
     grid-area: a;
 }
 
-#positivity {
+.birkhoff #positivity {
     grid-area: b;
 }
 
-#canvas-container {
+.birkhoff #canvas-container {
     grid-area: c;
     position: relative;
 }
 
-#graph {
+.birkhoff #graph {
     position: absolute;
     height: 100%;
     width: 100%;
 }
 
-#matching {
+.birkhoff #matching {
     grid-area: d;
 }
 
-#mask {
+.birkhoff #mask {
     grid-area: e;
 }
 
-#preferences {
+.birkhoff #preferences {
     grid-area: f;
 }
