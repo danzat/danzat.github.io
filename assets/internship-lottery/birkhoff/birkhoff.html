@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script type="text/javascript" src="birkhoff.js"> </script>
+    </head>
+    <body onload="demo = new Demo(['Ichiloc', 'Shiba', 'Wolfson', 'Ziv', 'Yoseftal'], 20)">
+        <button onclick="demo.render();">Reset</button>
+        <button onclick="demo.next();">Next</button>
+        <div>
+            <div id="step"></div>
+            <canvas id="graph" width="200" height="200"></canvas>
+            <table>
+                <tr>
+                    <td><div id="matrix"></div></td>
+                    <td><div id="positivity"></div></td>
+                    <td><div id="matching"></div></td>
+                    <td><div id="mask"></div></td>
+                </tr>
+            </table>
+            <table id="preferences"></table>
+        </div>
+    </body>
+</html>
