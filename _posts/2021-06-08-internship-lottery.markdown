@@ -83,130 +83,31 @@ Starting with {%raw%}$Q_0 = Q${%endraw%} the outline of the algorithm is as foll
 
    When {%raw%}$Q_{i+1} = O${%endraw%} we're done.
 
-Let's look at an example.
+### Interactive example
 
-### Example
+In this example, we have the allocation matrix of 20 students competing for: Mayo Clinic, Johns Hopkins, Charité, MGH.
 
-We'll try to decompose the following matrix:
+Click next to cycle through the iteration of the algorithm and watch the table at the end of the recovered individual preferences:
 
-{% raw %} $$
-Q_0 = \begin{pmatrix}
-3 & 2 & 1 \\
-3 & 3 & 0 \\
-0 & 1 & 5
-\end{pmatrix}
-$$ {% endraw %}
-
-The positivity matrix is:
-
-{% raw %} $$
-Q^{+}_0 = \begin{pmatrix}
-1 & 1 & 1 \\
-1 & 1 & 0 \\
-0 & 1 & 1
-\end{pmatrix}
-$$ {% endraw %}
-
-Which corresponds to the following bipartate graph (numbers for row vertices, letters for column vertices):
-
-![Bipartate0](/assets/internship-lottery/birkhoff/bipartate0.gv.png){: .center-image }
-
-It's pretty easy to find a perfect matching manually ({%raw%}$1a, 2b, 3c${%endraw%}):
-
-![Bipartate0 Matching](/assets/internship-lottery/birkhoff/bipartate0-matching.gv.png){: .center-image }
- 
-This corresponds to the matrix:
-
-{% raw %} $$
-P_0 = \begin{pmatrix}
-1 & 0 & 0 \\
-0 & 1 & 0 \\
-0 & 0 & 1
-\end{pmatrix}
-$$ {% endraw %}
-
-And the coefficient:
-
-{% raw %} $$
-n_0 = \min\left\lbrace Q_0 \circ P_0\right\rbrace = \begin{pmatrix}
-3 & 0 & 0 \\
-0 & 3 & 0 \\
-0 & 0 & 5
-\end{pmatrix} = 3
-$$ {% endraw %}
-
-Next iteration (now faster):
-
-{% raw %} $$
-Q_1 = Q_0 - 3 P_0 = \begin{pmatrix}
-0 & 2 & 1 \\
-3 & 0 & 0 \\
-0 & 1 & 2
-\end{pmatrix}
-\rightarrow
-Q^{+}_1 = \begin{pmatrix}
-0 & 1 & 1 \\
-1 & 0 & 0 \\
-0 & 1 & 1
-\end{pmatrix}
-$$ {% endraw %}
-
-The corresponding graph and its matching:
-
-![Bipartate1 Matching](/assets/internship-lottery/birkhoff/bipartate1-matching.gv.png){: .center-image }
-
-Which gives us:
-
-{% raw %} $$
-P_1 = \begin{pmatrix}
-0 & 1 & 0 \\
-1 & 0 & 0 \\
-0 & 0 & 1
-\end{pmatrix}
-$$ {% endraw %}
-
-{% raw %} $$
-n_1 = \min\left\lbrace Q_1 \circ P_1\right\rbrace = \begin{pmatrix}
-0 & 2 & 0 \\
-3 & 0 & 0 \\
-0 & 0 & 2
-\end{pmatrix} = 2
-$$ {% endraw %}
-
-Last iteration:
-
-{% raw %} $$
-Q_2 = Q_1 - 2 P_1 = \begin{pmatrix}
-0 & 0 & 1 \\
-1 & 0 & 0 \\
-0 & 1 & 0
-\end{pmatrix} = Q^{+}_2
-$$ {% endraw %}
-
-Let's take a shortcut here as it's pretty obvious this is the last permutation matrix. The decomposition is:
-
-{% raw %} $$
-Q = \begin{pmatrix}
-3 & 2 & 1 \\
-3 & 3 & 0 \\
-0 & 1 & 5
-\end{pmatrix} = 
-3 \begin{pmatrix}
-1 & 0 & 0 \\
-0 & 1 & 0 \\
-0 & 0 & 1
-\end{pmatrix} + 
-2 \begin{pmatrix}
-0 & 1 & 0 \\
-1 & 0 & 0 \\
-0 & 0 & 1
-\end{pmatrix} + 
-\begin{pmatrix}
-0 & 0 & 1 \\
-1 & 0 & 0 \\
-0 & 1 & 0
-\end{pmatrix}
-$$ {% endraw %}
+<div>
+<script>console.log(MathJax);</script>
+<script type="text/javascript" src="/assets/internship-lottery/birkhoff/birkhoff.js"></script>
+<button onclick="demo.next();">Next</button>
+<div>
+    <div id="step"></div>
+    <table>
+        <tr>
+            <td><div id="matrix"></div></td>
+            <td><div id="positivity"></div></td>
+            <td><div id="matching"></div></td>
+            <td><div id="mask"></div></td>
+        </tr>
+    </table>
+    <canvas id="graph" width="200" height="200"></canvas>
+    <table id="preferences"></table>
+</div>
+<script type="text/javascript">let demo = new Demo(["Mayo Clinic", "Johns Hopkins", "Charité", "MGH"], 20);</script>
+</div>
 
 ### Implementation
 
