@@ -29,5 +29,12 @@
             <link rel="stylesheet" href="/assets/css/{{ stylesheet }}.css">
         {% endfor %}
     {% endif %}
+
+    {% if page.custom_js %}
+        {% for script in page.custom_js %}
+            <script type="text/javascript" src="/assets/js/{{ script }}.js"></script>
+        {% endfor %}
+    {% endif %}
+
     {% seo %}
 </head>

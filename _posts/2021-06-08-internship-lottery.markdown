@@ -5,6 +5,7 @@ subtitle: "Overview and Setup"
 date:   2021-06-08
 categories: algorithm
 custom_css: birkhoff
+custom_js: birkhoff
 ---
 
 Recently my wife, who's studying medicine, had to partake in what's called an "internship lottery". The basic idea is that there are 25 hospitals, each with a specific amount of vacancies, and students need to be assigned to internships.
@@ -91,8 +92,6 @@ In this example, we have the allocation matrix of 20 students competing for: May
 Click next to cycle through the iteration of the algorithm and watch the table at the end of the recovered individual preferences:
 
 <div>
-    <script>console.log(MathJax);</script>
-    <script type="text/javascript" src="/assets/internship-lottery/birkhoff/birkhoff.js"></script>
     <button onclick="demo.next();">Next</button>
     <div id="step"></div>
     <div class="birkhoff">
