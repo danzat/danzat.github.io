@@ -104,7 +104,6 @@ Click next to cycle through the iteration of the algorithm and watch the table a
         <div id="mask"></div>
         <table id="preferences"></table>
     </div>
-    <script type="text/javascript">let demo = new Demo(["Mayo Clinic", "Johns Hopkins", "Charité", "MGH"], 20);</script>
 </div>
 
 ### Implementation

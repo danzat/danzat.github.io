@@ -399,3 +399,9 @@ class Demo {
         }
     }
 }
+
+var demo;
+
+window.onload = function() {
+    demo = new Demo(["Mayo Clinic", "Johns Hopkins", "Charité", "MGH"], 20);
+};
