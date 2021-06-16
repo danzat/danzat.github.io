@@ -146,7 +146,7 @@ class BipartateGraph {
 
         const top = vertical;
         const left = vertical;
-        const radius = 0.75 * (vertical / 2);
+        const radius = 0.5 * (vertical / 2);
         const right = width - vertical;
 
         for (let i = 0; i < this.size; i++) {
