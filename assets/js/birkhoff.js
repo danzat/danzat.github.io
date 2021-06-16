@@ -280,7 +280,7 @@ class BipartateGraph {
 function renderTEX(id, tex) {
     let element = document.getElementById(id);
     element.innerText = `$$${tex}$$`;
-    MathJax.typeset();
+    MathJax.Hub.Typeset(element);
 }
 
 class Demo {
