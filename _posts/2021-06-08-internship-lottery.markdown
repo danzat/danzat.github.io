@@ -139,7 +139,7 @@ def birkhoff(Q: np.matrix) -> Iterator[Tuple[int, np.matrix]]:
         P[list(edges)] = 1
 
         # 5. Find the coefficient
-        n = (P * Q).min()
+        n = min(Q[edges])
 
         # 6. Emit result
         yield n, P
