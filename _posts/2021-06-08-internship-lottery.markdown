@@ -77,7 +77,7 @@ Starting with {%raw%}$Q_0 = Q${%endraw%} the outline of the algorithm is as foll
 4. Convert the matching back to a matrix {%raw%}$P_i${%endraw%}
 5. Find the smallest element of {%raw%}$Q_i${%endraw%} when masked by {%raw%}$P_i${%endraw%}:
 
-   {%raw%}$$n_i = \min\left\lbrace \left[Q_i\right]_{r,c} : \left(r,c\right) \in \mathrm{Matching}\right\rbrace$${%endraw%}
+   {%raw%}$$n_i = \min_{\left(r,c\right) \in \mathrm{Matching}} \left[Q_i\right]_{r,c}$${%endraw%}
 
 6. We can now emit the {%raw%}$P_i${%endraw%} matrix {%raw%}$n_i${%endraw%} times
 7. {%raw%}$Q_{i+1} = Q_i - n_i P_i${%endraw%}
