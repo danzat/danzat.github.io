@@ -12,7 +12,12 @@ function shuffle(array) {
     return array;
 }
 
-let iteration = 0;
+let colors = [
+    "#362FBB",
+    "#712275",
+    "#F97698",
+    "#FFB845"
+];
 
 class Matrix {
     constructor(size) {
@@ -146,7 +151,7 @@ class BipartateGraph {
 
         const top = vertical;
         const left = vertical;
-        const radius = 0.5 * (vertical / 2);
+        const radius = 0.75 * (vertical / 2);
         const right = width - vertical;
 
         for (let i = 0; i < this.size; i++) {
@@ -176,18 +181,19 @@ class BipartateGraph {
             l.arc(left, y, radius, 0, 2 * Math.PI, false);
             r.arc(right, y, radius, 0, 2 * Math.PI, false);
 
-            ctx.fillStyle = "white";
+            ctx.fillStyle = colors[i];;
             ctx.fill(l);
+            ctx.fillStyle = "white";
             ctx.fill(r);
-            ctx.strokeStyle = "black";
+            ctx.strokeStyle = colors[i];
             ctx.stroke(l);
+            ctx.strokeStyle = "black";
             ctx.stroke(r);
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.font = `${radius}px serif`;
             ctx.fillStyle = "black";
-            ctx.fillText(String(i), left, y);
-            ctx.fillText(String.fromCharCode(i + "a".charCodeAt(0)), right, y);
+            ctx.fillText(String(i + 1), right, y);
         }
     }
 
@@ -273,50 +279,85 @@ class BipartateGraph {
                 }
             }
         }
-        return Object.entries(left_matches).map(x => [x[0], x[1] - this.size]);
+        return Object.entries(left_matches).map(x => [Number(x[0]), x[1] - this.size]);
     }
 }
 
-function renderTEX(id, tex) {
-    let element = document.getElementById(id);
-    element.innerText = `$$${tex}$$`;
-    MathJax.Hub.Typeset(element);
-}
-
 class Demo {
-    constructor(hospitals, students) {
-        this.size = hospitals.length;
-        this.hospital_names = hospitals;
+    constructor(n_hospitals, students) {
+        this.size = n_hospitals;
         this.iteration = 0;
         this.state = 0
         this.Q = new Matrix(this.size);
-
         this.hospitals = [...Array(this.size).keys()];
+
+        this.buildMatrixDOM();
 
         for (let i = 0; i < students; i++) {
             let p = shuffle(this.hospitals.slice());
             this.Q.iadd(Matrix.fromPermutation(p));
         }
 
-        let preferences = document.getElementById("preferences");
-        let thead = preferences.createTHead();
-        let row = thead.insertRow();
-        row.insertCell().innerText = "#";
-        for (let i of this.hospitals) {
-            row.insertCell().innerText = i;
-        }
-
-        this.prefs_tbody = preferences.createTBody();
-
         this.next();
     }
 
+    buildMatrixDOM() {
+        let matrixDOM = document.getElementById("matrix");
+
+        let header_row = document.createElement("div");
+        for (let j = 0; j <= this.size; j++) {
+            let cell = document.createElement("div");
+            if (j == 0) {
+                cell.setAttribute("class", "square-row-title");
+            } else {
+                cell.setAttribute("class", "square");
+                cell.innerText = `#${j}`;
+            }
+            header_row.insertAdjacentElement("beforeend", cell);
+        }
+        matrixDOM.insertAdjacentElement("beforeend", header_row);
+
+        for (let i = 0; i < this.size; i++) {
+            let row = document.createElement("div");
+            for (let j = 0; j <= this.size; j++) {
+                let cell = document.createElement("div");
+                if (j == 0) {
+                    cell.setAttribute("class", "square-row-title");
+                    cell.style.backgroundColor = colors[i];
+                } else {
+                    cell.setAttribute("class", "square");
+                }
+                row.insertAdjacentElement("beforeend", cell);
+            }
+            matrixDOM.insertAdjacentElement("beforeend", row);
+        }
+    }
+
+    getMatrixDOMCell(i, j) {
+        return document.getElementById("matrix").children[i + 1].children[j + 1];
+    }
+
+    renderMatrix(matrix) {
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                this.getMatrixDOMCell(i, j).innerText = matrix.m[i][j];
+            }
+        }
+    }
+
     emitPreference() {
-        let row = this.prefs_tbody.insertRow();
-        let preference = this.M.m.map(row => row.indexOf(1));
-        row.insertCell().innerText = `${this.p}x`;
-        for (let i of preference) {
-            row.insertCell().innerText = this.hospital_names[i];
+        let preferencesDOM = document.getElementById("preferences");
+        for (let i = 0; i < this.p; i++) {
+            let row = document.createElement("div");
+            row.setAttribute("class", "preferences-row");
+            let preference = this.M.m.map(row => row.indexOf(1));
+            for (let j of preference) {
+                let cell = document.createElement("div");
+                cell.setAttribute("class", "small-square");
+                cell.style.backgroundColor = colors[j];
+                row.insertAdjacentElement("beforeend", cell);
+            }
+            preferencesDOM.insertAdjacentElement("beforeend", row);
         }
     }
 
@@ -339,9 +380,14 @@ class Demo {
     next() {
         switch (this.state) {
             case 0:
-                this.clear();
                 this.stepTitle("");
-                renderTEX("matrix", `Q_{${this.iteration}}=${this.Q.asTex()}`);
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        let cell = this.getMatrixDOMCell(i, j);
+                        cell.style = "";
+                        cell.innerText = this.Q.m[i][j];
+                    }
+                }
                 if (!this.Q.isZero()) {
                     this.state++;
                 }
@@ -349,7 +395,13 @@ class Demo {
             case 1:
                 this.stepTitle("Calculate poisitity matrix");
                 this.Qp = this.Q.positivity();
-                renderTEX("positivity", `Q^{+}_{${this.iteration}}=${this.Qp.asTex()}`);
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        if (this.Qp.m[i][j] == 1) {
+                            this.getMatrixDOMCell(i, j).style.backgroundColor = "rgba(255, 0, 0, 0.3)";
+                        }
+                    }
+                }
                 this.state++;
                 break;
             case 2: {
@@ -369,10 +421,10 @@ class Demo {
             case 4: {
                 this.stepTitle("Conver the matching to a matrix");
                 this.M = new Matrix(this.size);
-                for (let edge of this.matching) {
-                    this.M.m[edge[0]][edge[1]] = 1;
+                for (const [i, j] of this.matching) {
+                    this.M.m[i][j] = 1;
+                    this.getMatrixDOMCell(i, j).style.backgroundColor = "rgba(0, 255, 0, 0.5)";
                 }
-                renderTEX("matching", `M_{${this.iteration}}=${this.M.asTex()}`);
                 this.state++;
                 break;
             }
@@ -380,18 +432,25 @@ class Demo {
                 this.stepTitle("Determine multiplier and emit result");
                 this.QM = this.Q.hadamard(this.M);
                 this.p = Math.min(...this.QM.m.map(row => Math.min(...row.filter(x => x != 0))));
+                for (const [i, j] of this.matching) {
+                    if (this.QM.m[i][j] == this.p) {
+                        this.getMatrixDOMCell(i, j).style.fontWeight = "bold";
+                    }
+                }
                 this.emitPreference();
-                let formatted = this.QM.asTex((i, j, v) => ((v == this.p) ? `\\mathbf{${v}}` : v));
-                renderTEX("mask", `Q_{${this.iteration}} \\circ M_{${this.iteration}} =${formatted}`);
                 this.state++;
                 break;
             }
             case 6: {
                 this.stepTitle("Prepare for next step");
+                for (const [i, j] of this.matching) {
+                    let cell = this.getMatrixDOMCell(i, j);
+                    cell.style.fontWeight = "normal";
+                    cell.innerText += `-${this.p}`;
+                }
                 this.iteration++;
                 this.Q.isub(this.M.scale(this.p));
                 this.state = 0;
-                this.next();
                 break;
             }
             default:
@@ -403,5 +462,5 @@ class Demo {
 var demo;
 
 window.onload = function() {
-    demo = new Demo(["Mayo Clinic", "Johns Hopkins", "Charité", "MGH"], 20);
+    demo = new Demo(4, 15);
 };

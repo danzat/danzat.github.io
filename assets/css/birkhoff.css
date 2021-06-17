@@ -1,41 +1,55 @@
-.birkhoff {
+.small-square {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 1px;
+    text-align: center;
+    vertical-align: middle;
+    background-color: red;
+}
+
+.square {
+    display: inline-block;
+    min-width: 30px;
+    height: 20px;
+    margin: 2px;
+    padding: 4px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.square-row-title {
+    display: inline-block;
+    width: 5px;
+    height: 20px;
+    margin: 2px;
+    padding: 4px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.birkhoff-demo {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+#matrix {
+    align-self: center;
+    background-color: blue!50%;
+}
+
+#graph {
+    align-self: center;
+    aspect-ratio: 1;
+}
+
+#preferences {
+    align-self: flex-start;
     display: grid;
-    grid-template-columns: 1fr 100px 100px 1fr;
-    grid-template-rows: 150px 150px 1fr;
-    gap: 10px;
-    grid-template-areas:
-        "a c c d"
-        "b c c e"
-        "f f f f";
 }
 
-.birkhoff #matrix {
-    grid-area: a;
-}
-
-.birkhoff #positivity {
-    grid-area: b;
-}
-
-.birkhoff #canvas-container {
-    grid-area: c;
-    position: relative;
-}
-
-.birkhoff #graph {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-}
-
-.birkhoff #matching {
-    grid-area: d;
-}
-
-.birkhoff #mask {
-    grid-area: e;
-}
-
-.birkhoff #preferences {
-    grid-area: f;
+.preferences-row {
+    display: inline-flex;
 }

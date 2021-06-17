@@ -87,22 +87,17 @@ Starting with {%raw%}$Q_0 = Q${%endraw%} the outline of the algorithm is as foll
 
 ### Interactive example
 
-In this example, we have the allocation matrix of 20 students competing for: Mayo Clinic, Johns Hopkins, Charité, MGH.
+In this example, we have the allocation matrix of 15 students competing for 4 hospitals (denoted by 4 colors).
 
-Click next to cycle through the iteration of the algorithm and watch the table at the end of the recovered individual preferences:
+Click next to cycle through the iteration of the algorithm and watch the middle to see the individual preferences as they are extracted (each preference line will consist of colored squares matching the hospitals):
 
 <div>
     <button onclick="demo.next();">Next</button>
     <div id="step"></div>
-    <div class="birkhoff">
+    <div class="birkhoff-demo">
         <div id="matrix"></div>
-        <div id="positivity"></div>
-        <div id="canvas-container">
-            <canvas id="graph" height="300px"></canvas>
-        </div>
-        <div id="matching"></div>
-        <div id="mask"></div>
-        <table id="preferences"></table>
+        <div id="preferences"></div>
+        <canvas id="graph"></canvas>
     </div>
 </div>
 
