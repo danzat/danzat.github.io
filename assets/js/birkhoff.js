@@ -388,7 +388,9 @@ class Demo {
                         cell.innerText = this.Q.m[i][j];
                     }
                 }
-                if (!this.Q.isZero()) {
+                if (this.Q.isZero()) {
+                    this.stepTitle("Done");
+                } else {
                     this.state++;
                 }
                 break;
