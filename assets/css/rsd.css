@@ -1,0 +1,145 @@
+button {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.square-off {
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin: 4px;
+    opacity: 0.2;
+}
+
+.square-on {
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin: 4px;
+}
+
+.square-current {
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin: 4px;
+    opacity: 0.7;
+}
+
+.rsd-demo {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+.students {
+    display: inline-flex;
+    align-self: center;
+    margin: 4px;
+}
+
+.students div {
+    display: block;
+}
+
+.hospitals {
+    align-self: center;
+    display: inline-flex;
+    margin: 4px;
+}
+
+.hospitals div {
+    align-self: baseline;
+}
+
+/* multi-rsd */
+
+#multi-rsd-demo .students > div {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+#multi-rsd-demo .outer {
+    display: inline-flex;
+    width: 20px;
+    height: 10px;
+    margin: 1px;
+}
+
+#multi-rsd-demo .square {
+    display: inline-block;
+    height: 10px;
+    align-self: flex-end;
+}
+
+#multi-rsd-demo #counter {
+    align-self: center;
+}
+
+/* trader demo */
+
+#trader-demo #trade {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#trader-demo .students {
+    display: inline-flex;
+    align-self: center;
+    margin: 4px;
+}
+
+#trader-demo .student {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    margin: 3px;
+    padding: 1px;
+    align-items: center;
+}
+
+#trader-demo .happiness {
+    width: 40px;
+    text-align: center;
+    height: 20px;
+    line-height: 20px;
+    font-family: monospace;
+    font-size: small;
+}
+
+#trader-demo .hospitals {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+#trader-demo .outer {
+    display: inline-flex;
+    width: 40px;
+    height: 20px;
+    margin: 1px;
+}
+
+#trader-demo .bar {
+    display: inline-block;
+    height: 20px;
+    align-self: flex-end;
+}
+
+#trader-demo .annotation {
+    position: absolute;
+    width: 40px;
+    text-align: center;
+    line-height: 20px;
+    font-family: monospace;
+}
