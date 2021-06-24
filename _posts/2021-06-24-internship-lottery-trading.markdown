@@ -96,7 +96,7 @@ To do that, we will run the same RSD, but with many different picking order (shu
             <span class="material-icons">stop</span>
             <span>Stop</span>
         </button>
-        <button id="start" onclick="reshuffle.stop()">
+        <button id="start" onclick="multi_rsd_demo.reshuffle()">
             <span class="material-icons">shuffle</span>
             <span>Shuffle</span>
         </button>
