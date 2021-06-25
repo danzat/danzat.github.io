@@ -12,173 +12,191 @@ function shuffle(array) {
     return array;
 }
 
-class SingleRSDDemo {
-    constructor(vacancies, colors) {
-        this.vacancies_orig = vacancies;
-        this.vacancies = {...this.vacancies_orig};
-        this.colors = colors;
-        this.n_hospitals = vacancies.length;
-        this.n_students = vacancies.reduce((x, y) => x + y, 0);
-        this.reshuffle();
-        this.root = document.getElementById("single-rsd");
-    }
+const zip = (a, b) => a.map((k, i) => [k, b[i]]);
 
-    reshuffle() {
-        this.shuffeled = [];
-        for (let i = 0; i < this.n_students; i++) {
-            this.shuffeled.push(shuffle([...Array(this.n_hospitals).keys()]));
+class RSDView {
+    constructor(root_id, inventory, colors) {
+        this.students_dom_map = [];
+        this.hospitals_dom_map = [];
+
+        let root = $(`#${root_id}`);
+
+        let inventory_dom = $("<div/>")
+            .attr("class", "inventory")
+            .appendTo(root);
+        for (const [vacancies, color] of zip(inventory, colors)) {
+            let hospital = $("<div/>")
+                .attr("class", "hospital")
+                .appendTo(inventory_dom);
+            let dom_map = [];
+            for (let i = 0; i < vacancies; i++) {
+                let square = $("<div/>")
+                    .attr("class", "square-on")
+                    .css("background-color", color)
+                    .appendTo(hospital); 
+                dom_map.push(square);
+            }
+            this.hospitals_dom_map.push(dom_map)
+        }
+
+        let students = $("<div/>")
+            .attr("class", "students")
+            .appendTo(root);
+        for (const vacancies of inventory) {
+            for (let i = 0; i < vacancies; i++) {
+                let column = $("<div/>")
+                    .attr("class", "ranking")
+                    .appendTo(students);
+                let dom_map = [];
+                for (let j = 0; j < inventory.length; j++) {
+                    let square = $("<div/>")
+                        .attr("class", "square-off")
+                        .appendTo(column); 
+                    dom_map.push(square);
+                }
+                this.students_dom_map.push(dom_map);
+            }
         }
     }
 
     reset() {
-        this.vacancies = {...this.vacancies_orig};
-        this.i = undefined;
+        this.hospitals_dom_map.flat().forEach(x => x.attr("class", "square-on"));
+        this.students_dom_map.flat().forEach(x => x.attr("class", "square-off"));
     }
 
-    prepareDOM() {
-        let students_div = this.root.getElementsByClassName("students")[0];
-        for (let row of this.shuffeled) {
-            let student_row = document.createElement("div");
-            students_div.insertAdjacentElement("beforeend", student_row);
-            for (let hospital of row) {
-                let square = document.createElement("div");
-                student_row.insertAdjacentElement("beforeend", square);
-            }
+    getHospitalSlot(hospital, slot) {
+        return this.hospitals_dom_map[hospital][slot];
+    }
+
+    getStudentPreference(student, preference) {
+        return this.students_dom_map[student][preference];
+    }
+}
+
+function shuffle(array) {
+    let i = array.length;
+    let sigma_i;
+
+    while (i != 0) {
+        sigma_i = Math.floor(Math.random() * i);
+        i--;
+
+        [array[i], array[sigma_i]] = [array[sigma_i], array[i]];
+    }
+
+    return array;
+}
+
+class SingleRSD {
+    constructor(root_id, inventory, colors) {
+        this.view = new RSDView(root_id, inventory, colors);
+        this.colors = colors;
+        this.original_inventory = inventory;
+        this.inventory = [...inventory];
+        this.hospitals = [...inventory.keys()];
+        this.n_students = inventory.reduce((x, y) => x + y, 0);
+        this.reshuffle();
+    }
+
+    reset() {
+        this.inventory = [...this.original_inventory];
+        this.view.reset();
+    }
+
+    reshuffle() {
+        let view = this.view;
+        let colors = this.colors;
+        this.shuffeled = [];
+        for (let i = 0; i < this.n_students; i++) {
+            let ranking = shuffle([...this.hospitals]);
+            ranking.forEach(
+                (hospital, j) => view.getStudentPreference(i, j)
+                .css("background-color", colors[hospital])
+            );
+            this.shuffeled.push(ranking);
         }
-
-        let hospitals_div = this.root.getElementsByClassName("hospitals")[0];
-        for (const number of Object.values(this.vacancies)) {
-            let row = document.createElement("div");
-            hospitals_div.insertAdjacentElement("beforeend", row);
-            for (let i = 0; i < number; i++) {
-                let square = document.createElement("div");
-                row.insertAdjacentElement("beforeend", square);
-            }
-        }
-    }
-
-    renderStudents() {
-        let students_div = this.root.getElementsByClassName("students")[0];
-        for (let i = 0; i < students_div.children.length; i++) {
-            let row = students_div.children[i];
-            for (let j = 0; j < row.children.length; j++) {
-                let hospital = this.shuffeled[i][j];
-                let square = row.children[j];
-                square.setAttribute("class", "square-off");
-                square.style.backgroundColor = this.colors[hospital];
-            }
-        }
-    }
-
-    renderHospitals() {
-        let hospitals_div = this.root.getElementsByClassName("hospitals")[0];
-        for (let i = 0; i < hospitals_div.children.length; i++) {
-            let row = hospitals_div.children[i];
-            for (let j = 0; j < row.children.length; j++) {
-                let square = row.children[j];
-                square.style.backgroundColor = this.colors[i];
-                square.setAttribute("class", "square-on");
-            }
-        }
-    }
-
-    getStudent(i) {
-        return this.root.getElementsByClassName("students")[0].children[i];
-    }
-
-    highlight(i, j) {
-        let cell = this.getStudent(i).children[j];
-        cell.setAttribute("class", "square-current");
-    }
-
-    mark(i, j) {
-        let cell = this.getStudent(i).children[j];
-        cell.setAttribute("class", "square-on");
-    }
-
-    clearStudent(i, j) {
-        if (i === undefined || j == undefined) {
-            return;
-        }
-        let cell = this.getStudent(i).children[j];
-        cell.setAttribute("class", "square-off");
-    }
-
-    removeHospital(hospital) {
-        let tag = this.root.getElementsByClassName("hospitals")[0];
-        let row = tag.children[hospital];
-        let last = row.children[this.vacancies_orig[hospital] - this.vacancies[hospital] - 1];
-        last.setAttribute("class", "square-off");
     }
 
     done() {
-        return Object.values(this.vacancies).every(v => v == 0);
+        return this.inventory.every(v => v == 0);
     }
 
-    step() {
-        if (this.i === undefined) {
-            this.i = 0;
-            this.j = 0;
-            this.state = 0;
-        }
-        let hospital = this.shuffeled[this.i][this.j];
-        this.clearStudent(this.prev_i, this.prev_j);
-        switch (this.state) {
-            case 0:
-                this.highlight(this.i, this.j);
-                if (this.vacancies[hospital] > 0) {
-                    this.state = 1;
-                } else {
-                    this.prev_i = this.i;
-                    this.prev_j = this.j;
-                    this.j++;
-                    if (this.j > 3) {
-                        this.i++;
-                        this.j = 0;
-                    }
+    highlight(student, preference) {
+        this.view.getStudentPreference(student, preference)
+            .attr("class", "square-current");
+    }
+
+    lowlight(student, preference) {
+        this.view.getStudentPreference(student, preference)
+            .attr("class", "square-off");
+    }
+
+    acquire(student, preference) {
+        this.view.getStudentPreference(student, preference)
+            .attr("class", "square-on");
+    }
+
+    consumeHospital(hospital) {
+        const current = this.original_inventory[hospital] - this.inventory[hospital] - 1;
+        this.view.getHospitalSlot(hospital, current)
+            .attr("class", "square-off");
+    }
+
+    *loop() {
+        let student = 0;
+        let i = 0;
+        while (!this.done()) {
+            this.highlight(student, i);
+            yield
+            let hospital = this.shuffeled[student][i];
+            if (this.inventory[hospital] > 0) {
+                this.inventory[hospital]--;
+                this.consumeHospital(hospital);
+                this.acquire(student, i);
+                yield
+                student++;
+                i = 0;
+            } else {
+                this.lowlight(student, i);
+                i++;
+                if (i > (this.n_hospitals - 1)) {
+                    i = 0;
+                    student++;
                 }
-                break;
-            case 1:
-                this.vacancies[hospital]--;
-                this.removeHospital(hospital);
-                this.mark(this.i, this.j);
-                this.prev_i = undefined;
-                this.prev_j = undefined;
-                this.i++;
-                this.j = 0;
-                this.state = 0;
-                break;
-            default:
-                break;
+            }
         }
     }
+}
 
-    loop() {
-        if (this.done()) {
-            window.clearInterval(this.iid);
-        } else {
-            this.step();
-        }
-    }
-
-    shuffle() {
-        this.reshuffle();
+class SingleRSDDemo {
+    constructor(inventory, colors) {
+        this.rsd = new SingleRSD("single-rsd-view", inventory, colors);
         this.reset();
-        this.renderStudents();
-        this.renderHospitals();
     }
 
-    restart() {
+    reset() {
+        this.rsd.reset();
+        this.iter = this.rsd.loop();
+    }
+
+    next() {
+        this.iter.next();
+    }
+
+    start() {
         if (this.iid) {
             window.clearInterval(this.iid);
         }
         this.reset();
-        this.renderStudents();
-        this.renderHospitals();
         let demo = this;
         this.iid = window.setInterval(function(){
-            demo.loop();
+            demo.next();
         }, 250);
+    }
+
+    shuffle() {
+        this.rsd.reshuffle();
+        this.rsd.reset();
     }
 }
 
@@ -572,8 +590,6 @@ window.onload = function() {
         "#C7CEEA"
     ];
     single_rsd_demo = new SingleRSDDemo([2, 5, 2, 1, 4], colors);
-    single_rsd_demo.prepareDOM();
-    single_rsd_demo.shuffle();
 
     multi_rsd_demo = new MultiRSDDemo([3, 2, 4, 5, 4], colors);
 

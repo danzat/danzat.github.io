@@ -57,12 +57,9 @@ On the right, are the hospitals' vacancies. A full block is free, while an empty
 The demo will cycle through the students, trying to grab the highest vacant position for each one. Which will be marked by a full square:
 
 <div id="single-rsd-demo">
-    <div class="rsd-demo" id="single-rsd">
-        <div class="hospitals"></div>
-        <div class="students"></div>
-    </div>
+    <div id="single-rsd-view"></div>
     <div class="controls">
-        <button id="start" onclick="single_rsd_demo.restart()">
+        <button id="start" onclick="single_rsd_demo.start()">
             <span class="material-icons">play_arrow</span>
             <span>(Re)Start</span>
         </button>

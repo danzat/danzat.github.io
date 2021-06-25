@@ -10,62 +10,73 @@ button {
     justify-content: center;
 }
 
-.square-off {
-    display: block;
+/* single-rsd */
+
+#single-rsd-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#single-rsd-view .inventory, .students {
+    display: flex;
+    flex-direction: row;
+}
+
+#single-rsd-view .hospital, .ranking {
+    display: flex;
+    flex-direction: column;
+}
+
+#single-rsd-view .hospital {
+    justify-content: flex-end;
+}
+
+#single-rsd-view .square-on, .square-off, .square-current {
+    display: inline-block;
     width: 20px;
-    height: 20px;
-    margin: 4px;
+    height:20px;
+    margin: 2px;
+    padding: 1px;
+}
+
+#single-rsd-view .square-current {
+    border: 1px solid black;
+    padding: 0px;
+    opacity: 0.5;
+}
+
+#single-rsd-view .square-off {
     opacity: 0.2;
 }
 
-.square-on {
-    display: block;
-    width: 20px;
-    height: 20px;
-    margin: 4px;
-}
+/* multi-rsd */
 
-.square-current {
-    display: block;
-    width: 20px;
-    height: 20px;
-    margin: 4px;
-    opacity: 0.7;
-}
-
-.rsd-demo {
+#multi-rsd-demo {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    align-items: center;
 }
-
-.students {
-    display: inline-flex;
-    align-self: center;
-    margin: 4px;
-}
-
-.students div {
-    display: block;
-}
-
-.hospitals {
-    align-self: center;
-    display: inline-flex;
-    margin: 4px;
-}
-
-.hospitals div {
-    align-self: baseline;
-}
-
-/* multi-rsd */
 
 #multi-rsd-demo .students > div {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
+}
+
+#multi-rsd-demo .hospitals {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+#multi-rsd-demo .hospitals > div {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
 }
 
 #multi-rsd-demo .outer {
@@ -79,6 +90,14 @@ button {
     display: inline-block;
     height: 10px;
     align-self: flex-end;
+}
+
+#multi-rsd-demo .square-on {
+    display: inline-block;
+    width: 20px;
+    height:20px;
+    margin: 2px;
+    padding: 1px;
 }
 
 #multi-rsd-demo #counter {
