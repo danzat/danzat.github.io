@@ -14,7 +14,7 @@ As mentioned in the previous post, the new lottery is composed of 3 steps:
 2. Successivly trade assignments between students to maximize satisfaction
 3. Use the new assignments to produce a final assignment that's acceptable on all parties.
 
-What is this RSD? What does "trading" mean? Is this "final" assignemnt?
+What is this RSD? What does "trading" mean? What is this "final" assignment?
 
 To understand what each step means, we need to understand the previous step that feeds it. So let's start with RSD.
 
