@@ -72,6 +72,10 @@ The demo will cycle through the students, trying to grab the highest vacant posi
 
 ### Assignment Trading
 
+It is not unlikely, that due to the random nature of the lottery, one student might get an assignment that favorable to someone else. If this is mutual, then the two students can trade assignments. This is actually common in practice.
+
+Sometimes, there are more complex cases where more than two students are involved in a "chain" of trades (which benefit all of them).
+
 ## Assignment Probability & Happiness
 
 As you can probably tell from playing with the example above, the assignment results are pretty random. We would like to eliminate the randomness and examine whether there's some underlying order.
@@ -121,6 +125,8 @@ h = p_1 M^2 + p_2 \left(M-1\right)^2 + ... + p_M 1^2 = \sum_{i=1}^M p_i \left(M 
 $${%endraw%}
 
 ## Probability Trading
+
+Extrapolating from the concept of assignment trading, we introduce a new concept called **probability trading**.
 
 Suppose we have two students A and B with assignment probabilities {%raw%}$\mathbf{p}_A${%endraw%} and {%raw%}$\mathbf{p}_B${%endraw%}.
 
