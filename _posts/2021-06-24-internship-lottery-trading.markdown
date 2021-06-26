@@ -213,9 +213,11 @@ The above is true for a specific selection of i, j. To find the overall maximum,
 $${%endraw%}
 
 ```py
-W = {h: (M - i + 1)**2 for i, h in enumerate(Hospitals)}
+W = {h: (M - i)**2 for i, h in enumerate(Hospitals)}
 
+@attr.s(auto_attribs=True)
 class Student:
+    ranking: List[Hospital]
     pi: Dict[Hospital, int]
     p: List[float]
 
@@ -227,6 +229,7 @@ class Student:
 
     @property
     def happiness() -> float:
+        return sum([p * W[this.pi[h]] for h, p in zip(this.ranking, this.p)])
 
 def feasable_trades(
     A: Student,
