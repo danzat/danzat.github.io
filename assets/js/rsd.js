@@ -401,6 +401,7 @@ class Trader {
         this.vacancies = vacancies;
         this.hospitals = [...Array(vacancies.length).keys()];
         this.n_students = vacancies.reduce((x, y) => x + y, 0);
+        this.base_happiness = Array(this.n_students).fill(0);
         this.reset();
     }
 
@@ -423,7 +424,10 @@ class Trader {
             hospitals_column.setAttribute("class", "hospitals");
             let happiness = document.createElement("div");
             happiness.setAttribute("class", "happiness");
+            let extra_happiness = document.createElement("div");
+            extra_happiness.setAttribute("class", "happiness");
             student_column.insertAdjacentElement("beforeend", happiness);
+            student_column.insertAdjacentElement("beforeend", extra_happiness);
             student_column.insertAdjacentElement("beforeend", hospitals_column);
             for (let hospital of student.preferences) {
                 let outer = document.createElement("div");
@@ -451,6 +455,7 @@ class Trader {
         for (const student of this.students) {
             let student_column = this.getStudentColumn(student);
             student_column.getElementsByClassName("happiness")[0].innerText = (student.happiness() / max_happiness).toFixed(3);
+            student_column.getElementsByClassName("happiness")[1].innerText = ((student.happiness() - this.base_happiness[student.id]) / max_happiness).toFixed(3);
             let hospitals_column = this.getHospitalsColumn(student);
             for (const [i_, hospital] of Object.entries(student.preferences)) {
                 const i = Number(i_);
@@ -469,6 +474,9 @@ class Trader {
             for (const [student, hospital] of Object.entries(assignments)) {
                 this.students[student].n[hospital]++;
             }
+        }
+        for (let student of this.students) {
+            this.base_happiness[student.id] = student.happiness();
         }
     }
 
@@ -491,7 +499,7 @@ class Trader {
 
     getHospitalsColumn(student) {
         let student_column = this.getStudentColumn(student);
-        return student_column.children[1];
+        return student_column.children[2];
     }
 
     annotateHospital(student, hospital, text) {

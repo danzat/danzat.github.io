@@ -261,7 +261,7 @@ def optimal_trade(A: List[float], B: List[float]):
 
 Click through next to cycle mutually beneficial trades.
 
-The number on the top is the happiness of each student (1 being the highest).
+The number on the top is the happiness of each student (1 being the highest), with the number below it representing the total increase in happiness due to the trade(s).
 
 The numbers on the colored bars represent the amount of traded assignments.
 
