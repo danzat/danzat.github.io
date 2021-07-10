@@ -136,12 +136,12 @@ We define "trading of probabilities" between the student. Student A can give a p
 
 Since probability can be traded only between the same hospital, it will do us good to rewrite the formulas a bit.
 
-For a student A, we define their preference mapping as {%raw%}$\pi_A : \mathrm{Hospital} \rightarrow \mathrm{Preference}${%endraw%}.
+For a student A, we define their preference mapping as {%raw%}$\pi_A : \mathcal{H} \rightarrow \mathrm{Preference}${%endraw%}.
 
 If we store the assignment probabilities sorted by hospital, rather than preference, we can rewrite the happiness as:
 
 {%raw%}$$
-h_A = \sum_{i \in \mathrm{Hospital}} w_{\pi_A(i)} p_{A,i} = \mathbf{w}^T \cdot \mathbf{\pi_A} \cdot \mathbf{p_A}
+h_A = \sum_{i \in \mathcal{H}} w_{\pi_A(i)} p_{A,i} = \mathbf{w}^T \cdot \mathbf{\pi_A} \cdot \mathbf{p_A}
 $${%endraw%}
 
 In the simplest case, only one "dose" of probability is traded between students:
@@ -174,7 +174,7 @@ $${%endraw%}
 Which means, we can only trade between specific hospitals:
 
 {%raw%}$$
-\mathrm{Trades} = \left\lbrace i, j \in \mathrm{Hospitals} : \pi_A(j) \lt \pi_A(i) \land \pi_B(i) \lt \pi_B(j)\right\rbrace
+\mathrm{Trades} = \left\lbrace i, j \in \mathcal{H} : \pi_A(j) \lt \pi_A(i) \land \pi_B(i) \lt \pi_B(j)\right\rbrace
 $${%endraw%}
 
 We want to find the size of the traded probability which maximizes the overall increase in happiness:
@@ -250,14 +250,14 @@ def iterate_all(
         yield delta, p, i, j
 
 def optimal_trade(A: List[float], B: List[float]):
-    _, p, i, j = max(iterate_all(A, B), operator.itemgetter(0))
+    delta, p, i, j = max(iterate_all(A, B), operator.itemgetter(0))
     A.give(i, p)
     B.receive(i, p)
     B.give(j, p)
     A.receive(j, p)
 ```
 
-## Probability Trading Demo
+### Single Probability Trading Demo
 
 Click through next to cycle mutually beneficial trades.
 
@@ -280,3 +280,90 @@ The numbers on the colored bars represent the amount of traded assignments.
         </button>
     </div>
 </div>
+
+### Multiple probability trading
+
+In reality, there could be more complex trading schemes which can squeeze out even more happiness for each student. For example, imagine this scenario:
+
+* Student A gives {%raw%}$p${%endraw%} of his probability to get hospital X
+* Student B gives {%raw%}$\frac{p}{4}${%endraw%} of his probability to get hospital Y and {%raw%}$\frac{3p}{4}${%endraw%} of his probability to get hospital Z
+
+This should give you a good sense about the type of these transactions, and you can probably imagine just how complex these could become.
+
+We can generalize these types of trades in the following manner:
+
+* Student A gives probabilities {%raw%}$\alpha${%endraw%} to get hospitals {%raw%}$T_A \subset \mathcal{H}${%endraw%} to student B.
+* In return student B gives probabilities {%raw%}$\beta${%endraw%} for hospitals {%raw%}$T_B \subset \mathcal{H}${%endraw%} to student A.
+
+Of course, we require that {%raw%}$T_A \cap T_B = \emptyset${%endraw%}.
+
+The changes in happiness will be as follows:
+
+{%raw%}$$
+\begin{eqnarray}
+\Delta_A = \hat{h}_A - h_A = - \sum_{i \in T_A} w_{\pi_A(i)} x^-_i + \sum_{i \in T_B} w_{\pi_A(i)} x^+_i\\
+\Delta_B = \hat{h}_B - h_B = - \sum_{i \in T_B} w_{\pi_B(i)} x^+_i + \sum_{i \in T_A} w_{\pi_B(i)} x^-_i
+\end{eqnarray}
+$${%endraw%}
+
+We can somewhat simplify the problem by eliminating the requirements for {%raw%}$T_A${%endraw%} and {%raw%}$T_B${%endraw%}. We can just assume there are trades between all hospitals, and that it's possible for a student to give probability {%raw%}$x^-_i${%endraw%} and receive {%raw%}$x^+_i${%endraw%} for the same hospital. It's a bit silly, but it makes sense that if an optimal trade exists, it will not be have "redundant" individual trades. And even if it does, they will cancel out.
+
+So the changes in happiness simplify to:
+
+{%raw%}$$
+\begin{eqnarray}
+\Delta_A = \sum_{i \in \mathcal{H}} w_{\pi_A(i)} \left(x^+_i - x^-_i\right) \\
+\Delta_B = \sum_{i \in \mathcal{H}} w_{\pi_B(i)} \left(x^-_i - x^+_i\right) \\
+\Delta = \Delta_A + \Delta_B = \sum_{i \in \mathcal{H}} \left(w_{\pi_A(i)} - w_{\pi_B(i)}\right) \left(x^+_i - x^-_i\right)
+\end{eqnarray}
+$${%endraw%}
+
+We require that each of the individual changes in happiness are positive:
+
+{%raw%}$$
+\begin{eqnarray}
+\Delta_A \gt 0 \\
+\Delta_B \gt 0
+\end{eqnarray}
+$${%endraw%}
+
+In addition we require that changes in probability make sense:
+
+{%raw%}$$
+\begin{eqnarray}
+x^-_i \leq p_{A,i} \\
+p_{A,i} + x^+_i \leq 1 \\
+x^+_i \leq p_{B,i} \\
+p_{B,i} + x^-_i \leq 1
+\end{eqnarray}
+$${%endraw%}
+
+Which can be rewritten as:
+
+{%raw%}$$
+\begin{eqnarray}
+x^-_i \leq \min\left\lbrace p_{A,i}, 1 - p_{B,i} \right\rbrace \\
+x^+_i \leq \min\left\lbrace p_{B,i}, 1 - p_{A,i} \right\rbrace
+\end{eqnarray}
+$${%endraw%}
+
+In addition, we have the following "preservation" requirement:
+
+{%raw%}$$
+\sum_{i \in \mathcal{H}} x^-_i = \sum_{i \in \mathcal{H}} x^+_i
+$${%endraw%}
+
+To summarize it all:
+
+{%raw%}$$
+\begin{eqnarray}
+\mathrm{maximize} \  & \Delta = \sum_{i \in \mathcal{H}} \left(w_{\pi_A(i)} - w_{\pi_B(i)}\right) \left(x^+_i - x^-_i\right) \\
+\mathrm{such\ that} & \sum_{i \in \mathcal{H}} w_{\pi_A(i)} \left(x^+_i - x^-_i\right) \gt 0 \\
+& \sum_{i \in \mathcal{H}} w_{\pi_B(i)} \left(x^-_i - x^+_i\right) \gt 0 \\
+& \sum_{i \in \mathcal{H}} \left( x^+_i - x^-_i \right) = 0 \\
+& 0 \le x^-_i \leq \min\left\lbrace p_{A,i}, 1 - p_{B,i} \right\rbrace \\
+& 0 \le x^+_i \leq \min\left\lbrace p_{B,i}, 1 - p_{A,i} \right\rbrace
+\end{eqnarray}
+$${%endraw%}
+
+This is a [Linear Programming](https://en.wikipedia.org/wiki/Linear_programming) problem, and solving them is quite tricky, which is why we're going to take a small detour and survey linear programming in the next few posts. Stay tuned.
