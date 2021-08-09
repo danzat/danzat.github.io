@@ -1,0 +1,8 @@
+#polyhedron {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#polyhedron #canvas {
+    border: 1px solid black;
+}
